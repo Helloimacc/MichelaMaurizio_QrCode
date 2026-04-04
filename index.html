@@ -1,6 +1,147 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Michela & Maurizio | Wedding App</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { wedding: { light: '#FAFAFA', dark: '#1A1A1A', gold: '#D4AF37', accent: '#F9F6F0' } },
+                    fontFamily: { sans: ['Montserrat', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #FAFAFA; color: #1A1A1A; -webkit-tap-highlight-color: transparent; }
+        
+        /* Modals and Animations */
+        .fade-out-up { animation: fadeOutUp 0.8s cubic-bezier(0.8, 0, 0.2, 1) forwards; }
+        @keyframes fadeOutUp { to { opacity: 0; transform: translateY(-50px); pointer-events: none; display: none; } }
+        
+        .slide-up-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-up-modal.open { transform: translateY(0); }
+
+        .photo-reveal { animation: reveal 0.5s ease-out forwards; opacity: 0; }
+        @keyframes reveal { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* Custom Checkbox */
+        .custom-checkbox:checked { background-color: #D4AF37; border-color: #D4AF37; }
+        
+        /* Audio Pulse */
+        .recording-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
+    </style>
+</head>
+<body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
+
+    <div id="privacy-screen" class="fixed inset-0 z-[100] bg-wedding-light flex flex-col items-center justify-center p-8">
+        <div class="max-w-sm w-full text-center">
+            <h1 class="font-serif text-4xl text-wedding-dark mb-2">Michela <span class="text-wedding-gold italic">&</span> Maurizio</h1>
+            <p class="text-xs uppercase tracking-widest text-gray-400 mb-10">09 Maggio 2026</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-left">
+                <h3 class="font-serif text-lg mb-4 text-center">Regole dell'Evento 📜</h3>
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="privacy-check" onchange="toggleEnterBtn()" class="custom-checkbox mt-1 w-5 h-5 rounded border-gray-300 text-wedding-gold focus:ring-wedding-gold transition-colors">
+                    <span class="text-xs text-gray-600 leading-relaxed font-medium">Giuro solennemente di caricare solo prove compromettenti, sorrisi giganti e di far divertire gli sposi! (Accetto condizioni privacy)</span>
+                </label>
+            </div>
+            
+            <button id="btn-enter" disabled onclick="enterApp()" class="w-full bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl opacity-50 cursor-not-allowed transition-all">
+                Entra nella Gallery
+            </button>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden flex-col items-center w-full flex-grow px-2 pt-8 pb-24">
+        <header class="text-center mb-8">
+            <h2 class="font-serif text-3xl text-wedding-dark mb-1">Live Gallery</h2>
+            <div class="h-px w-12 bg-wedding-gold mx-auto mt-3"></div>
+        </header>
+
+        <div id="gallery-grid" class="grid grid-cols-3 gap-1 w-full max-w-2xl mx-auto">
+            <p id="empty-state" class="col-span-3 text-center text-gray-400 italic font-serif py-10">Inizia a riempire questo spazio di ricordi.</p>
+        </div>
+    </div>
+
+    <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
+
+    <div id="preview-modal" class="slide-up-modal fixed inset-0 z-[80] bg-white flex flex-col pt-12 pb-24 px-4">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-serif text-2xl text-wedding-dark">Condividi</h3>
+            <button onclick="closePreview()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        
+        <div id="preview-grid" class="overflow-y-auto grid grid-cols-2 gap-3 mb-4"></div>
+        
+        <div class="mb-4">
+            <input type="text" id="photo-comment" placeholder="Aggiungi una dedica (opzionale)..." class="w-full bg-gray-50 border border-gray-200 text-sm p-4 rounded-xl focus:outline-none focus:border-wedding-gold transition-colors">
+        </div>
+
+        <div class="mt-auto">
+            <button onclick="startUpload()" id="upload-btn" class="w-full bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl flex justify-center items-center gap-2">
+                <i data-lucide="send" class="w-4 h-4"></i> Invia alla Gallery
+            </button>
+        </div>
+    </div>
+
+    <div id="audio-modal" class="slide-up-modal fixed inset-0 z-[80] bg-wedding-accent flex flex-col items-center justify-center px-6">
+        <button onclick="closeAudio()" class="absolute top-8 right-6 text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        
+        <div class="text-center mb-10">
+            <h3 class="font-serif text-3xl text-wedding-dark mb-2">Audio Guestbook</h3>
+            <p class="text-sm text-gray-500">Lascia un messaggio vocale agli sposi.<br>Hai 90 secondi.</p>
+        </div>
+
+        <div class="relative flex justify-center items-center w-32 h-32 mb-8">
+            <button id="mic-btn" onclick="toggleRecording()" class="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-wedding-gold text-wedding-gold transition-all">
+                <i data-lucide="mic" class="w-10 h-10" id="mic-icon"></i>
+            </button>
+        </div>
+        
+        <p id="audio-timer" class="font-mono text-xl text-wedding-dark font-medium mb-8">00:00</p>
+        
+        <button id="send-audio-btn" onclick="processAndUploadAudio()" disabled class="w-full max-w-xs bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl opacity-50 transition-all hidden">
+            Invia Messaggio
+        </button>
+    </div>
+
+    <nav class="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-md border-t border-gray-100 flex justify-around items-center px-2 py-2 z-[60] pb-safe">
+        <button onclick="closeModals()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100">
+            <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i>
+            <span class="text-[9px] uppercase tracking-wider font-semibold">Live</span>
+        </button>
+
+        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
+            <i data-lucide="plus" class="w-6 h-6"></i>
+        </button>
+
+        <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100">
+            <i data-lucide="mic" class="w-5 h-5 mb-1"></i>
+            <span class="text-[9px] uppercase tracking-wider font-semibold">Audio</span>
+        </button>
+
+        <button onclick="alert('Area Sposi: Stiamo lavorando al Pannello Admin!')" class="text-wedding-dark flex flex-col items-center w-16 opacity-30 hover:opacity-100">
+            <i data-lucide="lock" class="w-5 h-5 mb-1"></i>
+            <span class="text-[9px] uppercase tracking-wider font-semibold">Sposi</span>
+        </button>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
+        // CONFIGURAZIONE FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyAKSDOdxKmz_NmqhuijaNGZXdjLBXnHCU1E",
           authDomain: "fir-config-6e53e.firebaseapp.com",
@@ -11,17 +152,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
         };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // Salviamo tutto in "live_gallery" per avere un unico feed misto foto/audio
-        const galleryRef = collection(db, "live_gallery"); 
+        const galleryRef = collection(db, "live_gallery");
 
+        // CONFIGURAZIONE CLOUDINARY
         const CLOUD_NAME = "dvjgznbzm";
         const UPLOAD_PRESET = "wedding_live_feed";
 
         let selectedFilesArray = [];
         lucide.createIcons();
 
-        // --- 1. GESTIONE PRIVACY E ACCESSO ---
+        // --- 1. PRIVACY E ACCESSO ---
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             if(document.getElementById('privacy-check').checked) {
@@ -39,7 +179,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
             }, 600);
         };
 
-        // --- 2. GESTIONE FOTO E UPLOAD ---
+        // --- 2. UPLOAD FOTO ---
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         
         window.handleFileSelection = (event) => {
@@ -130,46 +270,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
             closePreview();
         };
 
-        // --- 3. RENDER GALLERY MISTA (FOTO + AUDIO) ---
-        const q = query(galleryRef, orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
-            const gallery = document.getElementById("gallery-grid");
-            const emptyState = document.getElementById("empty-state");
-            if (!snapshot.empty && emptyState) emptyState.remove();
-            
-            gallery.innerHTML = "";
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                
-                // SE IL FILE CARICATO È UN AUDIO
-                if (data.type === 'audio') {
-                    const audioHTML = `
-                        <div class="photo-reveal aspect-square relative overflow-hidden bg-wedding-accent rounded-sm flex flex-col items-center justify-center border border-gray-100 shadow-sm p-2">
-                            <i data-lucide="mic" class="w-6 h-6 text-wedding-gold mb-2 opacity-80"></i>
-                            <p class="text-[8px] uppercase tracking-widest font-semibold text-wedding-dark mb-2">Vocale</p>
-                            <audio controls src="${data.url}" class="w-[115%] h-8 scale-[0.80]"></audio>
-                        </div>
-                    `;
-                    gallery.insertAdjacentHTML('beforeend', audioHTML);
-                } 
-                // SE IL FILE CARICATO È UNA FOTO
-                else {
-                    const optimizedUrl = data.url.replace("/upload/", "/upload/w_300,h_300,c_fill,g_auto,q_auto,f_auto/");
-                    const commentHtml = data.comment ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-white text-[9px] truncate">${data.comment}</div>` : '';
-
-                    const imgHTML = `
-                        <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm">
-                            <img src="${optimizedUrl}" class="w-full h-full object-cover">
-                            ${commentHtml}
-                        </div>
-                    `;
-                    gallery.insertAdjacentHTML('beforeend', imgHTML);
-                }
-            });
-            lucide.createIcons();
-        });
-
-        // --- 4. LOGICA REGISTRAZIONE E UPLOAD AUDIO ---
+        // --- 3. AUDIO GUESTBOOK LOGIC ---
         let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
         
         window.openAudio = () => { document.getElementById('audio-modal').classList.add('open'); };
@@ -179,15 +280,23 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
             const btn = document.getElementById('mic-btn');
             const icon = document.getElementById('mic-icon');
             const timerDisplay = document.getElementById('audio-timer');
+            const sendBtn = document.getElementById('send-audio-btn');
 
             if (!mediaRecorder || mediaRecorder.state === 'inactive') {
                 try {
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                     mediaRecorder = new MediaRecorder(stream);
                     audioChunks = [];
+                    sendBtn.classList.add('hidden'); // Nascondi il tasto invia se c'era
 
                     mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-                    mediaRecorder.onstop = processAndUploadAudio; // Alla fine, avvia l'upload
+                    
+                    mediaRecorder.onstop = () => {
+                        // Quando si ferma, mostra il pulsante Invia
+                        sendBtn.classList.remove('hidden');
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = 'Invia Messaggio';
+                    };
 
                     mediaRecorder.start();
                     btn.classList.add('recording-pulse', 'border-red-500', 'text-red-500');
@@ -212,9 +321,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
             }
         };
 
-        const processAndUploadAudio = async () => {
+        window.processAndUploadAudio = async () => {
             const btn = document.getElementById('send-audio-btn');
-            btn.classList.remove('hidden');
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block"></i> Salvataggio...';
             btn.disabled = true;
 
@@ -224,14 +332,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
             formData.append("upload_preset", UPLOAD_PRESET);
 
             try {
-                // Upload Cloudinary (Endpoint Video/Raw per l'audio)
+                // Upload su Cloudinary (Endpoint Video/Raw)
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { 
                     method: "POST", 
                     body: formData 
                 });
                 const data = await res.json();
 
-                // Salvataggio Firebase con Etichetta 'audio'
+                // Salvataggio su Firebase
                 await addDoc(galleryRef, { 
                     url: data.secure_url, 
                     type: 'audio',
@@ -240,13 +348,52 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebas
 
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1A1A1A'] });
                 closeAudio();
-                document.getElementById('audio-timer').innerText = "00:00"; // Reset Timer
+                document.getElementById('audio-timer').innerText = "00:00";
             } catch (err) { 
                 console.error(err); 
                 alert("Errore durante l'invio dell'audio. Riprova.");
             } finally {
                 btn.classList.add('hidden');
-                btn.innerHTML = 'Invia Messaggio';
-                btn.disabled = false;
             }
         };
+
+        // --- 4. RENDER GALLERY MISTA (FOTO E AUDIO) ---
+        const q = query(galleryRef, orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const gallery = document.getElementById("gallery-grid");
+            const emptyState = document.getElementById("empty-state");
+            if (!snapshot.empty && emptyState) emptyState.remove();
+            
+            gallery.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                
+                if (data.type === 'audio') {
+                    // Render Audio
+                    const audioHTML = `
+                        <div class="photo-reveal aspect-square relative overflow-hidden bg-wedding-accent rounded-sm flex flex-col items-center justify-center border border-gray-100 shadow-sm p-1">
+                            <i data-lucide="mic" class="w-6 h-6 text-wedding-gold mb-1 opacity-80"></i>
+                            <p class="text-[8px] uppercase tracking-widest font-semibold text-wedding-dark mb-2">Vocale</p>
+                            <audio controls src="${data.url}" class="w-[115%] h-8 scale-[0.75] origin-center"></audio>
+                        </div>
+                    `;
+                    gallery.insertAdjacentHTML('beforeend', audioHTML);
+                } else {
+                    // Render Foto
+                    const optimizedUrl = data.url.replace("/upload/", "/upload/w_300,h_300,c_fill,g_auto,q_auto,f_auto/");
+                    const commentHtml = data.comment ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-white text-[9px] truncate">${data.comment}</div>` : '';
+
+                    const imgHTML = `
+                        <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm">
+                            <img src="${optimizedUrl}" class="w-full h-full object-cover">
+                            ${commentHtml}
+                        </div>
+                    `;
+                    gallery.insertAdjacentHTML('beforeend', imgHTML);
+                }
+            });
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
