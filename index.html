@@ -44,7 +44,7 @@
             pointer-events: none; 
         }
 
-        nav button { touch-action: manipulation; } /* Anti-zoom 10 tap */
+        nav button { touch-action: manipulation; } 
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
@@ -69,11 +69,9 @@
     </div>
 
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-24 relative">
-        
         <div class="sticky top-0 z-40 w-full bg-[#FAFAFA]/90 backdrop-blur-md pt-8 pb-5 border-b border-gray-100 mb-4 px-4 shadow-sm">
             <header class="text-center max-w-2xl mx-auto">
                 <h2 class="font-serif text-3xl text-wedding-dark mb-4">Live Gallery</h2>
-                
                 <button onclick="triggerUpload()" class="bg-wedding-dark text-white rounded-full px-6 py-3 font-medium uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center gap-3 mx-auto active:scale-95 transition-all w-full max-w-xs border border-gray-800">
                     <div class="relative shrink-0">
                         <i data-lucide="camera" class="w-5 h-5"></i>
@@ -95,7 +93,6 @@
         <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 hover:text-white p-2 z-50 transition-colors">
             <i data-lucide="x" class="w-8 h-8"></i>
         </button>
-        
         <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-4 z-50 transition-colors">
             <i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i>
         </button>
@@ -115,13 +112,10 @@
             <h3 class="font-serif text-2xl text-wedding-dark">Condividi</h3>
             <button onclick="closePreview()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        
         <div id="preview-grid" class="overflow-y-auto grid grid-cols-2 gap-3 mb-4"></div>
-        
         <div class="mb-4">
             <input type="text" id="photo-comment" placeholder="Aggiungi una dedica (opzionale)..." class="w-full bg-gray-50 border border-gray-200 text-sm p-4 rounded-xl focus:outline-none focus:border-wedding-gold transition-colors">
         </div>
-
         <div class="mt-auto">
             <button onclick="startUpload()" id="upload-btn" class="w-full bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl flex justify-center items-center gap-2">
                 <i data-lucide="send" class="w-4 h-4"></i> Invia alla Gallery
@@ -164,7 +158,10 @@
     <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <i data-lucide="lock" class="w-8 h-8 text-wedding-gold mb-4"></i>
-        <h3 class="font-sans tracking-widest uppercase text-white text-sm mb-8">Accesso Riservato</h3>
+        
+        <h3 class="font-sans tracking-widest uppercase text-white text-sm mb-8 text-center">
+            Area Riservata<br><span class="text-[10px] text-wedding-gold">agli sposi</span>
+        </h3>
         
         <div class="flex gap-4 mb-10">
             <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
@@ -205,7 +202,7 @@
             <span class="text-[9px] uppercase tracking-wider font-semibold">Audio</span>
         </button>
 
-        <button onclick="handleSecretAdmin()" class="text-wedding-dark flex flex-col items-center w-16 opacity-30 hover:opacity-100">
+        <button onclick="handleSecretAdmin(event)" class="text-wedding-dark flex flex-col items-center w-16 opacity-30 hover:opacity-100">
             <i data-lucide="lock" class="w-5 h-5 mb-1" id="lock-icon"></i>
             <span class="text-[9px] uppercase tracking-wider font-semibold">Sposi</span>
         </button>
@@ -226,24 +223,21 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const galleryRef = collection(db, "live_gallery");
-
         const CLOUD_NAME = "dvjgznbzm";
         const UPLOAD_PRESET = "wedding_live_feed";
 
         let selectedFilesArray = [];
-        let globalGalleryData = []; // Salva i dati delle foto per la Lightbox
+        let globalGalleryData = []; 
         let currentLightboxIndex = 0;
-
         lucide.createIcons();
 
-        // --- SCHERMATA PRIVACY ---
+        // 1. PRIVACY
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
             btn.classList.toggle('opacity-50', btn.disabled);
             btn.classList.toggle('cursor-not-allowed', btn.disabled);
         };
-
         window.enterApp = () => {
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
@@ -252,9 +246,8 @@
             }, 600);
         };
 
-        // --- UPLOAD FOTO E ANTEPRIMA ---
+        // 2. FOTO UPLOAD
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
-        
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
@@ -264,7 +257,6 @@
             document.getElementById('photo-comment').value = ''; 
             event.target.value = '';
         };
-
         window.renderPreviewGrid = () => {
             const grid = document.getElementById('preview-grid');
             grid.innerHTML = '';
@@ -275,7 +267,7 @@
                     <div class="flex flex-col gap-1 bg-white rounded-lg">
                         <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
                             <img src="${url}" class="w-full h-full object-cover ${flipClass}">
-                            <button onclick="removeFile(${index})" class="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full text-red-500 shadow-sm"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                            <button onclick="removeFile(${index})" class="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
                         </div>
                         <button onclick="toggleFlip(${index})" class="py-1 text-gray-500 text-[10px] uppercase font-bold flex items-center justify-center gap-1 border border-gray-200 rounded-md mt-1">
                             <i data-lucide="flip-horizontal" class="w-3 h-3"></i> Specchia
@@ -285,10 +277,8 @@
             });
             lucide.createIcons();
         };
-
         window.toggleFlip = (index) => { selectedFilesArray[index].flipped = !selectedFilesArray[index].flipped; renderPreviewGrid(); };
         window.removeFile = (index) => { selectedFilesArray.splice(index, 1); if (selectedFilesArray.length === 0) closePreview(); else renderPreviewGrid(); };
-        
         window.closePreview = () => { document.getElementById('preview-modal').classList.remove('open'); selectedFilesArray = []; };
         window.closeModals = () => { closePreview(); closeAudio(); closePinModal(); };
 
@@ -324,28 +314,19 @@
                     const formData = new FormData();
                     formData.append("file", fileToUpload);
                     formData.append("upload_preset", UPLOAD_PRESET);
-
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                     const data = await res.json();
-
-                    await addDoc(galleryRef, { 
-                        url: data.secure_url, 
-                        type: 'image',
-                        comment: comment, 
-                        timestamp: serverTimestamp() 
-                    });
+                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: comment, timestamp: serverTimestamp() });
                 } catch (err) { console.error(err); }
             }
-
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#1A1A1A', '#D4AF37', '#FAFAFA'] });
             btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Invia alla Gallery';
             btn.disabled = false;
             closePreview();
         };
 
-        // --- AUDIO LOGIC ---
+        // 3. AUDIO LOGIC
         let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
-        
         window.openAudio = () => { document.getElementById('audio-modal').classList.add('open'); };
         window.closeAudio = () => { 
             document.getElementById('audio-modal').classList.remove('open');
@@ -388,7 +369,6 @@
                         timerDisplay.innerText = `${m}:${s}`;
                         if (seconds >= 90) toggleRecording(); 
                     }, 1000);
-
                 } catch (err) { alert("Per favore, consenti l'accesso al microfono per registrare."); }
             } else {
                 mediaRecorder.stop();
@@ -415,7 +395,6 @@
             try {
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
                 const data = await res.json();
-                
                 await addDoc(galleryRef, { url: data.secure_url, type: 'audio', comment: comment, timestamp: serverTimestamp() });
 
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1A1A1A'] });
@@ -426,30 +405,25 @@
             finally { btn.classList.add('hidden'); }
         };
 
-        // --- LOGICA LIGHTBOX (Visualizzazione a tutto schermo con Swipe) ---
+        // 4. LIGHTBOX SWIPE
         window.openLightbox = (index) => {
             currentLightboxIndex = index;
             updateLightboxUI();
             document.getElementById('lightbox-modal').classList.remove('hidden');
             document.getElementById('lightbox-modal').classList.add('flex');
-            document.body.style.overflow = 'hidden'; // Blocca lo scorrimento del sito dietro
+            document.body.style.overflow = 'hidden'; 
         };
-
         window.closeLightbox = () => {
             document.getElementById('lightbox-modal').classList.remove('flex');
             document.getElementById('lightbox-modal').classList.add('hidden');
             document.body.style.overflow = ''; 
         };
-
         window.updateLightboxUI = () => {
             if (globalGalleryData.length === 0) return;
             const item = globalGalleryData[currentLightboxIndex];
-            
-            // Richiama l'immagine in alta risoluzione
             const highResUrl = item.url.replace("/upload/", "/upload/w_1200,c_limit,q_auto/");
             document.getElementById('lightbox-img').src = highResUrl;
             
-            // Gestione Commento
             const commentContainer = document.getElementById('lightbox-comment-container');
             const commentText = document.getElementById('lightbox-comment');
             if(item.comment) {
@@ -459,53 +433,41 @@
                 commentContainer.classList.add('hidden');
             }
         };
-
         window.prevLightbox = (e) => {
             if(e) e.stopPropagation();
             currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length;
             updateLightboxUI();
         };
-
         window.nextLightbox = (e) => {
             if(e) e.stopPropagation();
             currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length;
             updateLightboxUI();
         };
 
-        // Motore di Swipe per Mobile
-        let touchStartX = 0;
-        let touchEndX = 0;
+        let touchStartX = 0; let touchEndX = 0;
         const lightboxModal = document.getElementById('lightbox-modal');
-        
         lightboxModal.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
         lightboxModal.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
-            const swipeThreshold = 50; 
-            if (touchEndX < touchStartX - swipeThreshold) window.nextLightbox();
-            if (touchEndX > touchStartX + swipeThreshold) window.prevLightbox();
+            if (touchEndX < touchStartX - 50) window.nextLightbox();
+            if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-
-        // --- RENDER SEPARATO (FOTO MAIN / AUDIO MODAL) E COSTRUZIONE ARRAY LIGHTBOX ---
+        // 5. RENDER DATABASE
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
             const audioFeed = document.getElementById("audio-feed-grid");
             
-            gallery.innerHTML = "";
-            audioFeed.innerHTML = "";
-            
-            globalGalleryData = []; // Azzera l'array delle foto per la Lightbox
-            let photoIndexCounter = 0; // Contatore per gli indici delle foto
+            gallery.innerHTML = ""; audioFeed.innerHTML = "";
+            globalGalleryData = []; 
+            let photoIndexCounter = 0; 
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
-                
                 if (data.type === 'audio') {
-                    // RENDER AUDIO
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
-                    
                     const audioHTML = `
                         <div class="photo-reveal bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-center gap-4">
                             <div class="bg-wedding-accent rounded-full p-3 text-wedding-gold shrink-0"><i data-lucide="mic" class="w-5 h-5"></i></div>
@@ -519,17 +481,12 @@
                     `;
                     audioFeed.insertAdjacentHTML('beforeend', audioHTML);
                 } else {
-                    // RENDER FOTO
-                    // Salviamo l'url e il commento nell'array globale che serve allo Swipe
                     globalGalleryData.push({ url: data.url, comment: data.comment });
-                    
-                    const currentIndex = photoIndexCounter; // Salva l'indice attuale per l'onclick
+                    const currentIndex = photoIndexCounter; 
                     photoIndexCounter++;
 
                     const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
                     const commentHtml = data.comment ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-white text-[9px] truncate">${data.comment}</div>` : '';
-
-                    // Ho aggiunto l'onclick per aprire la lightbox all'indice corretto
                     const imgHTML = `
                         <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm cursor-pointer" onclick="openLightbox(${currentIndex})" oncontextmenu="return false;">
                             <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
@@ -541,34 +498,47 @@
                 }
             });
 
-            if (photoIndexCounter === 0) {
-                gallery.innerHTML = '<p id="empty-state" class="col-span-3 text-center text-gray-400 italic font-serif py-10">Inizia a riempire questo spazio di ricordi.</p>';
-            }
+            if (photoIndexCounter === 0) gallery.innerHTML = '<p id="empty-state" class="col-span-3 text-center text-gray-400 italic font-serif py-10">Inizia a riempire questo spazio di ricordi.</p>';
             lucide.createIcons();
         });
 
-        // --- LOGICA PIN PAD ADMIN ---
+        // 6. LOGICA HONEYPOT E PIN PAD
         let adminTapCount = 0;
         let adminTapTimer = null;
+        let isSecretUnlocked = false;
+        let failedAttempts = 0;
         let enteredPin = "";
         const PIN_CODE = "2026";
 
-        window.handleSecretAdmin = () => {
+        window.openPinModal = () => {
+            document.getElementById('pin-modal').classList.remove('hidden');
+            document.getElementById('pin-modal').classList.add('flex');
+            clearPin();
+        };
+
+        window.handleSecretAdmin = (e) => {
+            if(e) e.preventDefault();
             adminTapCount++;
+            
             const lockIcon = document.getElementById('lock-icon');
             lockIcon.classList.add('scale-125', 'text-wedding-gold');
             setTimeout(() => lockIcon.classList.remove('scale-125', 'text-wedding-gold'), 150);
 
-            if (adminTapCount === 1) {
-                adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 4000); 
-            }
+            clearTimeout(adminTapTimer);
 
             if (adminTapCount >= 10) {
-                clearTimeout(adminTapTimer);
-                adminTapCount = 0; 
-                document.getElementById('pin-modal').classList.remove('hidden');
-                document.getElementById('pin-modal').classList.add('flex');
-                updatePinDots();
+                // Chiave segreta sbloccata
+                isSecretUnlocked = true;
+                adminTapCount = 0;
+                confetti({ particleCount: 15, spread: 30, origin: { y: 0.9 }, colors: ['#D4AF37'] }); 
+                openPinModal();
+            } else {
+                // Se smette di cliccare prima di arrivare a 10, si apre la trappola (decoy)
+                adminTapTimer = setTimeout(() => {
+                    isSecretUnlocked = false;
+                    adminTapCount = 0;
+                    openPinModal(); 
+                }, 400); 
             }
         };
 
@@ -597,16 +567,24 @@
         };
 
         window.checkPin = () => {
-            if (enteredPin === PIN_CODE) {
+            // Controllo doppio: PIN corretto E Sequenza completata
+            if (enteredPin === PIN_CODE && isSecretUnlocked) {
                 confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#D4AF37', '#FAFAFA'] });
                 setTimeout(() => { window.location.href = "admin.html"; }, 800);
             } else {
+                // PIN errato o Sequenza finta
+                failedAttempts++;
                 const dotContainer = document.querySelector('.pin-dot').parentElement;
                 dotContainer.classList.add('translate-x-2');
                 setTimeout(() => dotContainer.classList.remove('translate-x-2'), 100);
                 setTimeout(() => dotContainer.classList.add('-translate-x-2'), 200);
                 setTimeout(() => dotContainer.classList.remove('-translate-x-2'), 300);
-                setTimeout(() => clearPin(), 400);
+                
+                if (failedAttempts >= 3) {
+                    setTimeout(() => window.location.reload(), 500); // 3 errori = reload pagina
+                } else {
+                    setTimeout(() => clearPin(), 400);
+                }
             }
         };
     </script>
