@@ -44,10 +44,7 @@
             pointer-events: none; 
         }
 
-        /* Scudo anti-zoom per la navbar (Risolve il problema dei 10 tap) */
-        nav button {
-            touch-action: manipulation;
-        }
+        nav button { touch-action: manipulation; } /* Anti-zoom 10 tap */
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
@@ -71,18 +68,47 @@
         </div>
     </div>
 
-    <div id="main-app" class="hidden flex-col items-center w-full flex-grow px-2 pt-8 pb-24">
-        <header class="text-center mb-8">
-            <h2 class="font-serif text-3xl text-wedding-dark mb-1">Live Gallery</h2>
-            <div class="h-px w-12 bg-wedding-gold mx-auto mt-3"></div>
-        </header>
+    <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-24 relative">
+        
+        <div class="sticky top-0 z-40 w-full bg-[#FAFAFA]/90 backdrop-blur-md pt-8 pb-5 border-b border-gray-100 mb-4 px-4 shadow-sm">
+            <header class="text-center max-w-2xl mx-auto">
+                <h2 class="font-serif text-3xl text-wedding-dark mb-4">Live Gallery</h2>
+                
+                <button onclick="triggerUpload()" class="bg-wedding-dark text-white rounded-full px-6 py-3 font-medium uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center gap-3 mx-auto active:scale-95 transition-all w-full max-w-xs border border-gray-800">
+                    <div class="relative shrink-0">
+                        <i data-lucide="camera" class="w-5 h-5"></i>
+                        <div class="absolute -bottom-1 -right-2 bg-wedding-gold text-white rounded-full w-3.5 h-3.5 flex items-center justify-center text-[10px] font-bold">+</div>
+                    </div>
+                    Carica qui le tue foto
+                </button>
+            </header>
+        </div>
 
-        <div id="gallery-grid" class="grid grid-cols-3 gap-1 w-full max-w-2xl mx-auto">
+        <div id="gallery-grid" class="grid grid-cols-3 gap-1 w-full max-w-2xl mx-auto px-1">
             <p id="empty-state" class="col-span-3 text-center text-gray-400 italic font-serif py-10">Inizia a riempire questo spazio di ricordi.</p>
         </div>
     </div>
 
     <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
+
+    <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-black/95 hidden flex-col items-center justify-center touch-none">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 hover:text-white p-2 z-50 transition-colors">
+            <i data-lucide="x" class="w-8 h-8"></i>
+        </button>
+        
+        <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-4 z-50 transition-colors">
+            <i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i>
+        </button>
+        <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-4 z-50 transition-colors">
+            <i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i>
+        </button>
+
+        <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain transition-transform duration-300 no-save" draggable="false">
+        
+        <div id="lightbox-comment-container" class="absolute bottom-10 inset-x-0 flex justify-center hidden">
+            <p id="lightbox-comment" class="text-white/90 text-sm italic text-center px-6 py-2 bg-black/50 rounded-full backdrop-blur-sm max-w-sm"></p>
+        </div>
+    </div>
 
     <div id="preview-modal" class="slide-up-modal fixed inset-0 z-[80] bg-white flex flex-col pt-12 pb-24 px-4">
         <div class="flex justify-between items-center mb-6">
@@ -131,8 +157,7 @@
 
         <div class="flex-grow flex flex-col">
             <h4 class="font-serif text-lg text-wedding-dark mb-4 text-center">Messaggi Ricevuti</h4>
-            <div id="audio-feed-grid" class="flex flex-col gap-3">
-                </div>
+            <div id="audio-feed-grid" class="flex flex-col gap-3"></div>
         </div>
     </div>
 
@@ -149,18 +174,18 @@
         </div>
 
         <div class="grid grid-cols-3 gap-6 w-full max-w-xs">
-            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">1</button>
-            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">2</button>
-            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">3</button>
-            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">4</button>
-            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">5</button>
-            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">6</button>
-            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">7</button>
-            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">8</button>
-            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">9</button>
+            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">1</button>
+            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">2</button>
+            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">3</button>
+            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">4</button>
+            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">5</button>
+            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">6</button>
+            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">7</button>
+            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">8</button>
+            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">9</button>
             <div></div>
-            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 transition-colors">0</button>
-            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest active:text-white transition-colors">Canc</button>
+            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">0</button>
+            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest active:text-white">Canc</button>
         </div>
     </div>
 
@@ -170,8 +195,9 @@
             <span class="text-[9px] uppercase tracking-wider font-semibold">Foto</span>
         </button>
 
-        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md active:scale-95 transition-transform">
-            <i data-lucide="camera" class="w-5 h-5"></i>
+        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-gray-300 -mt-5 border-4 border-[#FAFAFA] active:scale-95 transition-transform relative">
+            <i data-lucide="camera" class="w-6 h-6"></i>
+            <div class="absolute bottom-0 right-0 bg-wedding-gold text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold border-2 border-wedding-dark">+</div>
         </button>
 
         <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100">
@@ -205,8 +231,12 @@
         const UPLOAD_PRESET = "wedding_live_feed";
 
         let selectedFilesArray = [];
+        let globalGalleryData = []; // Salva i dati delle foto per la Lightbox
+        let currentLightboxIndex = 0;
+
         lucide.createIcons();
 
+        // --- SCHERMATA PRIVACY ---
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -222,6 +252,7 @@
             }, 600);
         };
 
+        // --- UPLOAD FOTO E ANTEPRIMA ---
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         
         window.handleFileSelection = (event) => {
@@ -340,7 +371,7 @@
                     mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
                     mediaRecorder.onstop = () => {
                         sendBtn.classList.remove('hidden');
-                        commentBox.classList.remove('hidden'); // Rivela il campo commento a fine registrazione
+                        commentBox.classList.remove('hidden');
                         sendBtn.disabled = false;
                         sendBtn.innerHTML = 'Invia Messaggio';
                     };
@@ -385,12 +416,7 @@
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
                 const data = await res.json();
                 
-                await addDoc(galleryRef, { 
-                    url: data.secure_url, 
-                    type: 'audio', 
-                    comment: comment, 
-                    timestamp: serverTimestamp() 
-                });
+                await addDoc(galleryRef, { url: data.secure_url, type: 'audio', comment: comment, timestamp: serverTimestamp() });
 
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1A1A1A'] });
                 document.getElementById('audio-timer').innerText = "00:00";
@@ -400,7 +426,67 @@
             finally { btn.classList.add('hidden'); }
         };
 
-        // --- RENDER SEPARATO (FOTO MAIN / AUDIO MODAL) ---
+        // --- LOGICA LIGHTBOX (Visualizzazione a tutto schermo con Swipe) ---
+        window.openLightbox = (index) => {
+            currentLightboxIndex = index;
+            updateLightboxUI();
+            document.getElementById('lightbox-modal').classList.remove('hidden');
+            document.getElementById('lightbox-modal').classList.add('flex');
+            document.body.style.overflow = 'hidden'; // Blocca lo scorrimento del sito dietro
+        };
+
+        window.closeLightbox = () => {
+            document.getElementById('lightbox-modal').classList.remove('flex');
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            document.body.style.overflow = ''; 
+        };
+
+        window.updateLightboxUI = () => {
+            if (globalGalleryData.length === 0) return;
+            const item = globalGalleryData[currentLightboxIndex];
+            
+            // Richiama l'immagine in alta risoluzione
+            const highResUrl = item.url.replace("/upload/", "/upload/w_1200,c_limit,q_auto/");
+            document.getElementById('lightbox-img').src = highResUrl;
+            
+            // Gestione Commento
+            const commentContainer = document.getElementById('lightbox-comment-container');
+            const commentText = document.getElementById('lightbox-comment');
+            if(item.comment) {
+                commentText.innerText = `"${item.comment}"`;
+                commentContainer.classList.remove('hidden');
+            } else {
+                commentContainer.classList.add('hidden');
+            }
+        };
+
+        window.prevLightbox = (e) => {
+            if(e) e.stopPropagation();
+            currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length;
+            updateLightboxUI();
+        };
+
+        window.nextLightbox = (e) => {
+            if(e) e.stopPropagation();
+            currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length;
+            updateLightboxUI();
+        };
+
+        // Motore di Swipe per Mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const lightboxModal = document.getElementById('lightbox-modal');
+        
+        lightboxModal.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        lightboxModal.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            const swipeThreshold = 50; 
+            if (touchEndX < touchStartX - swipeThreshold) window.nextLightbox();
+            if (touchEndX > touchStartX + swipeThreshold) window.prevLightbox();
+        }, {passive: true});
+
+
+        // --- RENDER SEPARATO (FOTO MAIN / AUDIO MODAL) E COSTRUZIONE ARRAY LIGHTBOX ---
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
@@ -409,12 +495,14 @@
             gallery.innerHTML = "";
             audioFeed.innerHTML = "";
             
-            let photoCount = 0;
+            globalGalleryData = []; // Azzera l'array delle foto per la Lightbox
+            let photoIndexCounter = 0; // Contatore per gli indici delle foto
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 
                 if (data.type === 'audio') {
+                    // RENDER AUDIO
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
                     
@@ -431,12 +519,19 @@
                     `;
                     audioFeed.insertAdjacentHTML('beforeend', audioHTML);
                 } else {
-                    photoCount++;
+                    // RENDER FOTO
+                    // Salviamo l'url e il commento nell'array globale che serve allo Swipe
+                    globalGalleryData.push({ url: data.url, comment: data.comment });
+                    
+                    const currentIndex = photoIndexCounter; // Salva l'indice attuale per l'onclick
+                    photoIndexCounter++;
+
                     const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
                     const commentHtml = data.comment ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-white text-[9px] truncate">${data.comment}</div>` : '';
 
+                    // Ho aggiunto l'onclick per aprire la lightbox all'indice corretto
                     const imgHTML = `
-                        <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm" oncontextmenu="return false;">
+                        <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm cursor-pointer" onclick="openLightbox(${currentIndex})" oncontextmenu="return false;">
                             <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
                             <div class="absolute inset-0 z-10 no-save"></div>
                             ${commentHtml}
@@ -446,7 +541,7 @@
                 }
             });
 
-            if (photoCount === 0) {
+            if (photoIndexCounter === 0) {
                 gallery.innerHTML = '<p id="empty-state" class="col-span-3 text-center text-gray-400 italic font-serif py-10">Inizia a riempire questo spazio di ricordi.</p>';
             }
             lucide.createIcons();
@@ -487,26 +582,17 @@
             if (enteredPin.length < 4) {
                 enteredPin += num;
                 updatePinDots();
-                
-                if (enteredPin.length === 4) {
-                    setTimeout(() => checkPin(), 200);
-                }
+                if (enteredPin.length === 4) setTimeout(() => checkPin(), 200);
             }
         };
 
-        window.clearPin = () => {
-            enteredPin = "";
-            updatePinDots();
-        };
+        window.clearPin = () => { enteredPin = ""; updatePinDots(); };
 
         window.updatePinDots = () => {
             const dots = document.querySelectorAll('.pin-dot');
             dots.forEach((dot, index) => {
-                if (index < enteredPin.length) {
-                    dot.classList.add('bg-wedding-gold');
-                } else {
-                    dot.classList.remove('bg-wedding-gold');
-                }
+                if (index < enteredPin.length) dot.classList.add('bg-wedding-gold');
+                else dot.classList.remove('bg-wedding-gold');
             });
         };
 
