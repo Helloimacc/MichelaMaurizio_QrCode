@@ -6,7 +6,7 @@
     <title>Michela & Maurizio | Wedding App</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -50,7 +50,8 @@
             
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-left">
                 <h3 class="font-serif text-lg mb-4 text-center">Firma il Registro 🖋️</h3>
-                <input type="text" id="guest-name" placeholder="Il tuo nome (opzionale)" class="w-full bg-gray-50 border border-gray-200 text-sm p-3 rounded-xl mb-4 focus:outline-none focus:border-wedding-gold transition-colors text-center">
+                
+                <input type="text" id="guest-name" placeholder="Il tuo nome (opzionale)" class="w-full bg-gray-50 border border-gray-200 text-base font-bold text-wedding-dark p-4 rounded-xl mb-4 focus:outline-none focus:border-wedding-gold transition-colors text-center placeholder:font-normal placeholder:text-gray-400">
                 
                 <div class="w-full h-px bg-gray-100 my-4"></div>
 
@@ -103,6 +104,15 @@
         <div id="lightbox-comment-container" class="absolute bottom-10 inset-x-0 flex justify-center hidden">
             <p id="lightbox-comment" class="text-white/90 text-sm italic text-center px-6 py-2 bg-black/50 rounded-full backdrop-blur-sm max-w-sm"></p>
         </div>
+    </div>
+
+    <div id="likes-modal-overlay" class="fixed inset-0 z-[130] bg-black/40 hidden opacity-0 transition-opacity duration-300"></div>
+    <div id="likes-modal" class="slide-up-modal fixed bottom-0 inset-x-0 z-[140] bg-white rounded-t-3xl shadow-2xl flex flex-col max-h-[70vh]">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl sticky top-0" id="likes-drag-handle">
+            <h3 class="font-serif text-lg text-wedding-dark font-bold pl-2">Piace a...</h3>
+            <button onclick="closeLikesModal()" class="text-gray-400 p-2 bg-gray-50 rounded-full hover:bg-gray-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-4 pb-12 bg-white"></div>
     </div>
 
     <div id="preview-modal" class="slide-up-modal fixed inset-0 z-[80] bg-white flex flex-col pt-12 pb-24 px-4">
@@ -219,10 +229,11 @@
         let globalGalleryData = []; 
         let currentLightboxIndex = 0;
         let globalGuestName = ""; 
+        let currentLikesMap = {}; // Salva l'array di like per ogni foto/audio
         
         lucide.createIcons();
 
-        // 1. PRIVACY E NOME
+        // 1. PRIVACY E NOME CON SERIALE UNICO
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -231,7 +242,9 @@
         };
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
-            globalGuestName = inputName ? inputName : `Fantasma 👻`; 
+            // Genera un ID univoco per chi non mette il nome, risolvendo il problema dei like sovrascritti
+            const randomCode = Math.floor(1000 + Math.random() * 9000);
+            globalGuestName = inputName ? inputName : `Fantasma 👻 #${randomCode}`; 
             
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
@@ -240,7 +253,7 @@
             }, 600);
         };
 
-        // 2. SISTEMA DEI LIKE
+        // 2. SISTEMA DEI LIKE 
         window.toggleLike = async (docId, event) => {
             if(event) event.stopPropagation(); 
             
@@ -259,7 +272,58 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
-        // 3. UPLOAD FOTO E ANTEPRIMA
+        // LISTA LIKE (MODAL) E GESTIONE SWIPE DOWN
+        window.openLikesModal = (docId, event) => {
+            if(event) event.stopPropagation();
+            const likesArr = currentLikesMap[docId] || [];
+            const listEl = document.getElementById('likes-list');
+            listEl.innerHTML = '';
+            
+            if(likesArr.length === 0) {
+                listEl.innerHTML = '<p class="text-gray-400 text-sm text-center font-serif italic mt-4">Nessun like ancora.</p>';
+            } else {
+                // Ribalta l'array per mostrare i like più recenti in alto
+                [...likesArr].reverse().forEach(liker => {
+                    listEl.insertAdjacentHTML('beforeend', `
+                        <div class="flex items-center gap-4 border-b border-gray-50 pb-3">
+                            <div class="w-10 h-10 rounded-full bg-wedding-accent flex items-center justify-center text-wedding-gold shrink-0 border border-wedding-gold/20">
+                                <i data-lucide="user" class="w-5 h-5"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-wedding-dark">${liker}</span>
+                        </div>
+                    `);
+                });
+            }
+            lucide.createIcons();
+
+            // Mostra Modale e Overlay
+            const overlay = document.getElementById('likes-modal-overlay');
+            const modal = document.getElementById('likes-modal');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            modal.classList.add('open');
+        };
+
+        window.closeLikesModal = () => {
+            const overlay = document.getElementById('likes-modal-overlay');
+            const modal = document.getElementById('likes-modal');
+            overlay.classList.add('opacity-0');
+            modal.classList.remove('open');
+            setTimeout(() => overlay.classList.add('hidden'), 300);
+        };
+
+        // Chiusura al click fuori o Swipe giù
+        document.getElementById('likes-modal-overlay').addEventListener('click', closeLikesModal);
+        
+        let likesTouchStartY = 0;
+        document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
+        document.getElementById('likes-modal').addEventListener('touchend', e => {
+            let touchEndY = e.changedTouches[0].screenY;
+            if (touchEndY > likesTouchStartY + 60) window.closeLikesModal(); // Swipe verso il basso
+        }, {passive: true});
+
+
+        // 3. UPLOAD FOTO
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
@@ -299,7 +363,7 @@
         window.toggleFlip = (index) => { selectedFilesArray[index].flipped = !selectedFilesArray[index].flipped; renderPreviewGrid(); };
         window.removeFile = (index) => { selectedFilesArray.splice(index, 1); if (selectedFilesArray.length === 0) closePreview(); else renderPreviewGrid(); };
         window.closePreview = () => { document.getElementById('preview-modal').classList.remove('open'); selectedFilesArray = []; };
-        window.closeModals = () => { closePreview(); closeAudio(); closePinModal(); };
+        window.closeModals = () => { closePreview(); closeAudio(); closePinModal(); closeLikesModal(); };
 
         const getFlippedFile = (file) => {
             return new Promise((resolve) => {
@@ -326,8 +390,6 @@
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Invio...';
             btn.disabled = true;
 
-            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
-
             for (let i = 0; i < selectedFilesArray.length; i++) {
                 let item = selectedFilesArray[i];
                 try {
@@ -343,7 +405,7 @@
                         url: data.secure_url, 
                         type: 'image', 
                         comment: item.comment, 
-                        guestName: finalGuestName, 
+                        guestName: globalGuestName, 
                         likes: [],
                         timestamp: serverTimestamp() 
                     });
@@ -417,8 +479,6 @@
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block"></i> Salvataggio...';
             btn.disabled = true;
 
-            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
-
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             const formData = new FormData();
             formData.append("file", audioBlob, "guestbook_audio.webm");
@@ -432,7 +492,7 @@
                     url: data.secure_url, 
                     type: 'audio', 
                     comment: comment, 
-                    guestName: finalGuestName, 
+                    guestName: globalGuestName, 
                     likes: [],
                     timestamp: serverTimestamp() 
                 });
@@ -512,6 +572,10 @@
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 const docId = docSnap.id;
+                
+                // Salva i like nell'oggetto globale per la visualizzazione lista
+                currentLikesMap[docId] = data.likes || [];
+                
                 const isLiked = localLikes.includes(docId);
                 const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
                 
@@ -520,13 +584,13 @@
 
                 if (data.type === 'audio') {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
-                    const audioAuthor = data.guestName ? data.guestName : 'Ospite';
+                    const audioAuthor = data.guestName ? data.guestName : 'Un Fantasma 👻';
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
                     
                     let likesText = '';
                     if (likesCount > 0) {
                         const lastLiker = likesArr[likesArr.length - 1];
-                        likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
+                        likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto cursor-pointer" onclick="openLikesModal('${docId}', event)">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
                     }
 
                     const audioHTML = `
@@ -571,7 +635,6 @@
                         }
                     }
 
-                    // Layout POLAROID a 2 Colonne con pannello Like
                     const imgHTML = `
                         <div class="photo-reveal bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative" oncontextmenu="return false;">
                             <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${currentIndex})">
@@ -585,7 +648,7 @@
                                     <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0">
                                         <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
                                     </button>
-                                    <div class="flex-grow min-w-0 pr-1 flex items-center">
+                                    <div class="flex-grow min-w-0 pr-1 flex items-center cursor-pointer active:opacity-50" onclick="openLikesModal('${docId}', event)">
                                         ${likesText}
                                     </div>
                                 </div>
@@ -596,7 +659,7 @@
                 }
             });
 
-            // ROMPI IL GHIACCIO (Solo se vuoto!)
+            // ROMPI IL GHIACCIO
             if (photoIndexCounter === 0) {
                 gallery.innerHTML = `
                     <div class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
@@ -616,7 +679,7 @@
             lucide.createIcons();
         });
 
-        // 7. HONEYPOT E PIN PAD AGGIORNATO E BILANCIATO
+        // 7. HONEYPOT E PIN PAD AGGIORNATO (Tolleranza calibrata)
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
         
@@ -634,15 +697,16 @@
                 isSecretUnlocked = true; 
                 confetti({ particleCount: 15, spread: 30, origin: { y: 0.9 }, colors: ['#D4AF37'] }); 
                 openPinModal();
-                adminTapCount = 0; // Azzera ma mantiene sbloccato
+                adminTapCount = 0; 
             } else {
+                // Aumentata la tolleranza del timer a 800ms per facilitare i 10 tap
                 adminTapTimer = setTimeout(() => {
                     if (adminTapCount > 0) {
                         isSecretUnlocked = false; 
                         adminTapCount = 0; 
-                        openPinModal(); // Apre la finta schermata se la raffica si interrompe
+                        openPinModal(); 
                     }
-                }, 600); // 600 millisecondi di tolleranza per il tap successivo
+                }, 800); 
             }
         };
 
