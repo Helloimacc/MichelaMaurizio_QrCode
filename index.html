@@ -245,6 +245,7 @@
         
         lucide.createIcons();
 
+        // 0. GESTIONE SESSIONE (Evita di richiedere il nome se si ricarica la pagina)
         window.onload = () => {
             const savedSession = sessionStorage.getItem('wedding_session_name');
             if(savedSession) {
@@ -255,13 +256,13 @@
             }
         };
 
+        // 1. PRIVACY E NOME 
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
             btn.classList.toggle('opacity-50', btn.disabled);
             btn.classList.toggle('cursor-not-allowed', btn.disabled);
         };
-        
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
             const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -276,6 +277,7 @@
             }, 600);
         };
 
+        // TASTO AGGIORNA VISUALE
         window.forceVisualRefresh = (e) => {
             if(e) {
                 const icon = e.currentTarget.querySelector('i');
@@ -286,6 +288,7 @@
             scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
+        // 2. SISTEMA DEI LIKE 
         window.toggleLike = async (docId, event) => {
             if(event) event.stopPropagation(); 
             
@@ -304,6 +307,7 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
+        // LISTA LIKE (MODAL)
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
             const likesArr = currentLikesMap[docId] || [];
@@ -350,7 +354,7 @@
             if (touchEndY > likesTouchStartY + 60) window.closeLikesModal(); 
         }, {passive: true});
 
-
+        // 3. UPLOAD FOTO E ANTEPRIMA
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
@@ -591,29 +595,47 @@
             if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // 6. RENDER DATABASE E COLONNE POLAROID
+        // 6. MOTORE SMART DOM UPDATE (Nessun Lampeggio o Salto dello schermo)
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
             const audioFeed = document.getElementById("audio-feed-grid");
             
-            gallery.innerHTML = ""; audioFeed.innerHTML = "";
+            // Se ci sono dati, elimina i messaggi di stato vuoto
+            if (!snapshot.empty) {
+                const es1 = document.getElementById("empty-state");
+                if (es1) es1.remove();
+                const es2 = document.getElementById("empty-audio-state");
+                if (es2) es2.remove();
+            }
+            
             globalGalleryData = []; 
-            let photoIndexCounter = 0; 
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
+
+            // Pulizia: Rimuove dal DOM gli elementi eliminati (Es. cancellati dall'admin)
+            const currentDocIds = snapshot.docs.map(doc => "card-" + doc.id);
+            Array.from(gallery.children).forEach(child => {
+                if (child.id && child.id.startsWith('card-') && !currentDocIds.includes(child.id)) child.remove();
+            });
+            Array.from(audioFeed.children).forEach(child => {
+                if (child.id && child.id.startsWith('card-') && !currentDocIds.includes(child.id)) child.remove();
+            });
+
+            let imageIndex = 0;
+            let audioIndex = 0;
 
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 const docId = docSnap.id;
                 
                 currentLikesMap[docId] = data.likes || [];
+                const likesArr = data.likes || [];
+                const likesCount = likesArr.length;
                 
+                // Il cuore è rosso SOLO se l'utente attuale (il suo browser locale) ha messo like
                 const isLiked = localLikes.includes(docId);
                 const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
                 const imageBadgeHeartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-white';
-                
-                const likesArr = data.likes || [];
-                const likesCount = likesArr.length;
 
                 if (data.type === 'audio') {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
@@ -628,8 +650,13 @@
                         likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto cursor-pointer" onclick="openLikesModal('${docId}', event)">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
                     }
 
-                    const audioHTML = `
-                        <div class="photo-reveal bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col">
+                    // Se non esiste la card, la crea. Altrimenti l'aggiorna.
+                    let card = document.getElementById(`card-${docId}`);
+                    if (!card) {
+                        card = document.createElement('div');
+                        card.id = `card-${docId}`;
+                        card.className = "photo-reveal bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col";
+                        card.innerHTML = `
                             <div class="flex items-center gap-3">
                                 <div class="bg-wedding-accent rounded-full p-3 text-wedding-gold shrink-0"><i data-lucide="mic" class="w-5 h-5"></i></div>
                                 <div class="flex-grow min-w-0">
@@ -639,27 +666,35 @@
                                 </div>
                             </div>
                             <div class="flex items-center mt-3 pt-3 border-t border-gray-50">
-                                <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform">
+                                <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform" id="btn-like-${docId}">
                                     <i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>
                                 </button>
-                                ${likesText}
+                                <div id="text-like-${docId}" class="ml-auto flex items-center">${likesText}</div>
                                 <span class="text-[9px] text-gray-300 ml-3 shrink-0">${dateStr}</span>
                             </div>
-                        </div>
-                    `;
-                    audioFeed.insertAdjacentHTML('beforeend', audioHTML);
-                } else {
-                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName });
-                    const currentIndex = photoIndexCounter; 
-                    photoIndexCounter++;
+                        `;
+                    } else {
+                        // Aggiorna solo le parti volatili (I Cuori) senza far lampeggiare l'immagine
+                        document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>`;
+                        document.getElementById(`text-like-${docId}`).innerHTML = likesText;
+                    }
 
-                    const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
+                    // Assicura l'ordine corretto nel DOM
+                    if (audioFeed.children[audioIndex] !== card) {
+                        audioFeed.insertBefore(card, audioFeed.children[audioIndex]);
+                    }
+                    audioIndex++;
+
+                } else {
+                    const pIndex = globalGalleryData.length;
+                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName });
                     
+                    const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
                     const cleanAuthor = data.guestName.startsWith("Fantasma") ? "" : data.guestName;
                     let authorText = cleanAuthor ? `<span class="font-bold text-wedding-gold">${cleanAuthor}</span>` : '';
                     let commentPart = data.comment ? `"${data.comment}"` : '';
                     let separator = (authorText && commentPart) ? ': ' : '';
-                    const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate">${authorText}${separator}${commentPart}</p></div>` : '';
+                    const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate pr-6">${authorText}${separator}${commentPart}</p></div>` : '';
 
                     let likesBadge = '';
                     let likesText = '<span class="text-[9px] text-gray-400 font-medium">Sii il primo!</span>';
@@ -667,7 +702,6 @@
                     if (likesCount > 0) {
                         const lastLikerRaw = likesArr[likesArr.length - 1];
                         const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
-                        
                         const otherTxt = (likesCount - 1) > 0 ? ` e altri ${likesCount - 1}` : '';
                         
                         likesBadge = `<div class="absolute top-1 left-1 z-20 bg-black/40 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-sm"><i data-lucide="heart" class="w-2.5 h-2.5 ${imageBadgeHeartClass}"></i><span class="text-[7px] text-white font-medium max-w-[60px] truncate">Piace a ${lastLiker}${otherTxt}</span></div>`;
@@ -679,51 +713,68 @@
                         }
                     }
 
-                    const imgHTML = `
-                        <div class="photo-reveal bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative" oncontextmenu="return false;">
-                            <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${currentIndex})">
-                                ${likesBadge}
+                    let card = document.getElementById(`card-${docId}`);
+                    if (!card) {
+                        card = document.createElement('div');
+                        card.id = `card-${docId}`;
+                        card.className = "photo-reveal bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative";
+                        card.setAttribute("oncontextmenu", "return false;");
+                        card.innerHTML = `
+                            <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${pIndex})" id="img-container-${docId}">
+                                <div id="badge-container-${docId}">${likesBadge}</div>
                                 <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
                                 <div class="absolute inset-0 z-0 no-save"></div>
                                 ${commentHtml}
                             </div>
-                            
                             <div class="p-1.5 flex items-center justify-between bg-white h-9 border-t border-gray-50">
                                 <div class="flex items-center gap-1.5 w-full">
-                                    <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0">
+                                    <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0" id="btn-like-${docId}">
                                         <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
                                     </button>
-                                    <div class="flex-grow min-w-0 pr-1 flex items-center cursor-pointer active:opacity-50" onclick="openLikesModal('${docId}', event)">
+                                    <div class="flex-grow min-w-0 pr-1 flex items-center cursor-pointer active:opacity-50" onclick="openLikesModal('${docId}', event)" id="text-like-${docId}">
                                         ${likesText}
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                    gallery.insertAdjacentHTML('beforeend', imgHTML);
+                        `;
+                    } else {
+                        // Aggiorna dinamicamente senza ricaricare l'immagine
+                        document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>`;
+                        document.getElementById(`text-like-${docId}`).innerHTML = likesText;
+                        document.getElementById(`badge-container-${docId}`).innerHTML = likesBadge;
+                        document.getElementById(`img-container-${docId}`).setAttribute("onclick", `openLightbox(${pIndex})`);
+                    }
+
+                    if (gallery.children[imageIndex] !== card) {
+                        gallery.insertBefore(card, gallery.children[imageIndex]);
+                    }
+                    imageIndex++;
                 }
             });
 
-            if (photoIndexCounter === 0) {
+            // Se la galleria è interamente vuota, rimetti i box Rompighiaccio
+            if (imageIndex === 0) {
                 gallery.innerHTML = `
-                    <div class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
+                    <div id="empty-state" class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
                         <i data-lucide="sparkles" class="w-8 h-8 text-wedding-gold mb-3 opacity-80"></i>
                         <p class="font-serif text-lg text-wedding-dark italic leading-relaxed">Rompi il ghiaccio!<br><span class="text-sm text-gray-500 font-sans">Sii il primo a scattare una foto.</span></p>
                     </div>
                 `;
             }
-            if (audioFeed.innerHTML === "") {
+            if (audioIndex === 0) {
                 audioFeed.innerHTML = `
-                    <div class="bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl p-5 shadow-sm flex flex-col items-center text-center">
+                    <div id="empty-audio-state" class="bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl p-5 shadow-sm flex flex-col items-center text-center">
                         <div class="bg-white rounded-full p-3 shadow-sm mb-3"><i data-lucide="mic" class="w-6 h-6 text-wedding-gold"></i></div>
                         <p class="font-serif text-sm text-wedding-dark italic">"Il microfono è acceso.<br>Lascia un messaggio!"</p>
                     </div>
                 `;
             }
+            
+            // Riattiva le icone solo per gli elementi aggiornati
             lucide.createIcons();
         });
 
-        // 7. HONEYPOT E PIN PAD
+        // 7. HONEYPOT E PIN PAD 
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
         
