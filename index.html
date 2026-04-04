@@ -50,7 +50,6 @@
             
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-left">
                 <h3 class="font-serif text-lg mb-4 text-center">Firma il Registro 🖋️</h3>
-                
                 <input type="text" id="guest-name" placeholder="Il tuo nome (opzionale)" class="w-full bg-gray-50 border border-gray-200 text-sm p-3 rounded-xl mb-4 focus:outline-none focus:border-wedding-gold transition-colors text-center">
                 
                 <div class="w-full h-px bg-gray-100 my-4"></div>
@@ -88,7 +87,7 @@
             </header>
         </div>
 
-        <div id="gallery-grid" class="grid grid-cols-3 gap-1 w-full max-w-2xl mx-auto px-1">
+        <div id="gallery-grid" class="grid grid-cols-2 gap-3 w-full max-w-2xl mx-auto px-3">
             </div>
     </div>
 
@@ -223,7 +222,7 @@
         
         lucide.createIcons();
 
-        // --- NOME E ACCESSO ---
+        // 1. PRIVACY E NOME
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -232,8 +231,7 @@
         };
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
-            // Se non inserisce il nome, assegniamo un ID fantasma univoco per la sessione
-            globalGuestName = inputName ? inputName : `Fantasma 👻 ${Math.floor(Math.random() * 1000)}`; 
+            globalGuestName = inputName ? inputName : `Fantasma 👻`; 
             
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
@@ -242,20 +240,18 @@
             }, 600);
         };
 
-        // --- SISTEMA DEI LIKE (CUORE) ---
+        // 2. SISTEMA DEI LIKE
         window.toggleLike = async (docId, event) => {
-            if(event) event.stopPropagation(); // Evita che si apra la foto quando clicchi il cuore
+            if(event) event.stopPropagation(); 
             
             const docRef = doc(db, "live_gallery", docId);
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
 
             try {
                 if (localLikes.includes(docId)) {
-                    // Togli Like
                     localStorage.setItem('wedding_likes', JSON.stringify(localLikes.filter(id => id !== docId)));
                     await updateDoc(docRef, { likes: arrayRemove(globalGuestName) });
                 } else {
-                    // Aggiungi Like
                     localLikes.push(docId);
                     localStorage.setItem('wedding_likes', JSON.stringify(localLikes));
                     await updateDoc(docRef, { likes: arrayUnion(globalGuestName) });
@@ -263,7 +259,7 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
-        // --- UPLOAD FOTO ---
+        // 3. UPLOAD FOTO E ANTEPRIMA
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
@@ -359,7 +355,7 @@
             closePreview();
         };
 
-        // --- AUDIO ---
+        // 4. AUDIO LOGIC
         let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
         window.openAudio = () => { document.getElementById('audio-modal').classList.add('open'); };
         window.closeAudio = () => { 
@@ -449,7 +445,7 @@
             finally { btn.classList.add('hidden'); }
         };
 
-        // --- LIGHTBOX ---
+        // 5. LIGHTBOX
         window.openLightbox = (index) => {
             currentLightboxIndex = index;
             updateLightboxUI();
@@ -502,26 +498,13 @@
             if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // --- RENDER DATABASE ---
+        // 6. RENDER DATABASE E COLONNE POLAROID
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
             const audioFeed = document.getElementById("audio-feed-grid");
             
-            // INTRO CARDS (Sempre Visibili all'inizio)
-            gallery.innerHTML = `
-                <div class="aspect-square relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-sm flex flex-col items-center justify-center p-3 text-center shadow-inner">
-                    <i data-lucide="sparkles" class="w-6 h-6 text-wedding-gold mb-2 opacity-60"></i>
-                    <p class="font-serif text-xs text-wedding-dark italic leading-relaxed">"Rompi il ghiaccio!<br>Scatta la prima foto epica di oggi."</p>
-                </div>
-            `;
-            audioFeed.innerHTML = `
-                <div class="bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl p-5 shadow-sm flex flex-col items-center text-center">
-                    <div class="bg-white rounded-full p-3 shadow-sm mb-3"><i data-lucide="mic" class="w-6 h-6 text-wedding-gold"></i></div>
-                    <p class="font-serif text-sm text-wedding-dark italic">"Il microfono è acceso.<br>Lascia un messaggio che gli sposi riascolteranno (forse) con gioia!"</p>
-                </div>
-            `;
-            
+            gallery.innerHTML = ""; audioFeed.innerHTML = "";
             globalGalleryData = []; 
             let photoIndexCounter = 0; 
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
@@ -530,7 +513,7 @@
                 const data = docSnap.data();
                 const docId = docSnap.id;
                 const isLiked = localLikes.includes(docId);
-                const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-white/80';
+                const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
                 
                 const likesArr = data.likes || [];
                 const likesCount = likesArr.length;
@@ -542,8 +525,7 @@
                     
                     let likesText = '';
                     if (likesCount > 0) {
-                        const lastLikerRaw = likesArr[likesArr.length - 1];
-                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
+                        const lastLiker = likesArr[likesArr.length - 1];
                         likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
                     }
 
@@ -558,8 +540,8 @@
                                 </div>
                             </div>
                             <div class="flex items-center mt-3 pt-3 border-t border-gray-50">
-                                <button onclick="toggleLike('${docId}')" class="text-gray-400 p-1 active:scale-90 transition-transform">
-                                    <i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}"></i>
+                                <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform">
+                                    <i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'}"></i>
                                 </button>
                                 ${likesText}
                                 <span class="text-[9px] text-gray-300 ml-auto">${dateStr}</span>
@@ -577,51 +559,93 @@
                     let commentPart = data.comment ? `"${data.comment}"` : '';
                     let separator = (authorText && commentPart) ? ': ' : '';
                     
-                    const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate pr-6">${authorText}${separator}${commentPart}</p></div>` : '';
+                    const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate">${authorText}${separator}${commentPart}</p></div>` : '';
 
-                    let likesBadge = '';
+                    let likesText = '<span class="text-[9px] text-gray-400 font-medium">Sii il primo!</span>';
                     if (likesCount > 0) {
-                        const lastLikerRaw = likesArr[likesArr.length - 1];
-                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
-                        const otherTxt = (likesCount - 1) > 0 ? ` e altri ${likesCount - 1}` : '';
-                        likesBadge = `<div class="absolute top-1 left-1 z-20 bg-black/40 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-sm"><i data-lucide="heart" class="w-2.5 h-2.5 fill-red-500 text-red-500"></i><span class="text-[7px] text-white font-medium max-w-[60px] truncate">Piace a ${lastLiker}${otherTxt}</span></div>`;
+                        const lastLiker = likesArr[likesArr.length - 1];
+                        if (likesCount === 1) {
+                            likesText = `<span class="text-[9px] text-gray-500 font-medium w-full truncate">Piace a <span class="font-bold text-wedding-dark">${lastLiker}</span></span>`;
+                        } else {
+                            likesText = `<span class="text-[9px] text-gray-500 font-medium w-full truncate">Piace a <span class="font-bold text-wedding-dark">${lastLiker}</span> e altri ${likesCount - 1}</span>`;
+                        }
                     }
 
+                    // Layout POLAROID a 2 Colonne con pannello Like
                     const imgHTML = `
-                        <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm cursor-pointer" onclick="openLightbox(${currentIndex})" oncontextmenu="return false;">
-                            ${likesBadge}
-                            <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
-                            <div class="absolute inset-0 z-0 no-save"></div>
-                            ${commentHtml}
-                            <button onclick="toggleLike('${docId}', event)" class="absolute bottom-1 right-1 z-20 p-1.5 bg-black/20 hover:bg-black/40 backdrop-blur-md rounded-full transition-colors">
-                                <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
-                            </button>
+                        <div class="photo-reveal bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative" oncontextmenu="return false;">
+                            <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${currentIndex})">
+                                <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
+                                <div class="absolute inset-0 z-0 no-save"></div>
+                                ${commentHtml}
+                            </div>
+                            
+                            <div class="p-1.5 flex items-center justify-between bg-white h-9 border-t border-gray-50">
+                                <div class="flex items-center gap-1.5 w-full">
+                                    <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0">
+                                        <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
+                                    </button>
+                                    <div class="flex-grow min-w-0 pr-1 flex items-center">
+                                        ${likesText}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     `;
                     gallery.insertAdjacentHTML('beforeend', imgHTML);
                 }
             });
+
+            // ROMPI IL GHIACCIO (Solo se vuoto!)
+            if (photoIndexCounter === 0) {
+                gallery.innerHTML = `
+                    <div class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
+                        <i data-lucide="sparkles" class="w-8 h-8 text-wedding-gold mb-3 opacity-80"></i>
+                        <p class="font-serif text-lg text-wedding-dark italic leading-relaxed">Rompi il ghiaccio!<br><span class="text-sm text-gray-500 font-sans">Sii il primo a scattare una foto.</span></p>
+                    </div>
+                `;
+            }
+            if (audioFeed.innerHTML === "") {
+                audioFeed.innerHTML = `
+                    <div class="bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl p-5 shadow-sm flex flex-col items-center text-center">
+                        <div class="bg-white rounded-full p-3 shadow-sm mb-3"><i data-lucide="mic" class="w-6 h-6 text-wedding-gold"></i></div>
+                        <p class="font-serif text-sm text-wedding-dark italic">"Il microfono è acceso.<br>Lascia un messaggio!"</p>
+                    </div>
+                `;
+            }
             lucide.createIcons();
         });
 
-        // 6. LOGICA PIN PAD ADMIN (HONEYPOT)
+        // 7. HONEYPOT E PIN PAD AGGIORNATO E BILANCIATO
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
+        
         window.handleSecretAdmin = (e) => {
             if(e) e.preventDefault();
             adminTapCount++;
+            
             const lockIcon = document.getElementById('lock-icon');
             lockIcon.classList.add('scale-125', 'text-wedding-gold');
             setTimeout(() => lockIcon.classList.remove('scale-125', 'text-wedding-gold'), 150);
+            
             clearTimeout(adminTapTimer);
+
             if (adminTapCount >= 10) {
-                isSecretUnlocked = true; adminTapCount = 0;
+                isSecretUnlocked = true; 
                 confetti({ particleCount: 15, spread: 30, origin: { y: 0.9 }, colors: ['#D4AF37'] }); 
                 openPinModal();
+                adminTapCount = 0; // Azzera ma mantiene sbloccato
             } else {
-                adminTapTimer = setTimeout(() => { isSecretUnlocked = false; adminTapCount = 0; openPinModal(); }, 400); 
+                adminTapTimer = setTimeout(() => {
+                    if (adminTapCount > 0) {
+                        isSecretUnlocked = false; 
+                        adminTapCount = 0; 
+                        openPinModal(); // Apre la finta schermata se la raffica si interrompe
+                    }
+                }, 600); // 600 millisecondi di tolleranza per il tap successivo
             }
         };
+
         window.closePinModal = () => { document.getElementById('pin-modal').classList.remove('flex'); document.getElementById('pin-modal').classList.add('hidden'); clearPin(); };
         window.enterPin = (num) => {
             if (enteredPin.length < 4) {
