@@ -44,7 +44,7 @@
             pointer-events: none; 
         }
 
-        nav button { touch-action: manipulation; } 
+        .touch-manipulation { touch-action: manipulation; }
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
@@ -55,20 +55,30 @@
             <p class="text-xs uppercase tracking-widest text-gray-400 mb-10">09 Maggio 2026</p>
             
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-8 text-left">
-                <h3 class="font-serif text-lg mb-4 text-center">Regole dell'Evento 📜</h3>
+                <h3 class="font-serif text-lg mb-4 text-center">Firma il Registro 🖋️</h3>
+                
+                <input type="text" id="guest-name" placeholder="Il tuo nome (opzionale)" class="w-full bg-gray-50 border border-gray-200 text-sm p-3 rounded-xl mb-4 focus:outline-none focus:border-wedding-gold transition-colors text-center">
+                
+                <div class="w-full h-px bg-gray-100 my-4"></div>
+
                 <label class="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" id="privacy-check" onchange="toggleEnterBtn()" class="custom-checkbox mt-1 w-5 h-5 rounded border-gray-300 text-wedding-gold focus:ring-wedding-gold transition-colors">
-                    <span class="text-xs text-gray-600 leading-relaxed font-medium">Giuro solennemente di caricare solo prove compromettenti, sorrisi giganti e di far divertire gli sposi! (Accetto condizioni privacy)</span>
+                    <span class="text-xs text-gray-600 leading-relaxed font-medium">Giuro solennemente di caricare solo prove compromettenti e far divertire gli sposi! (Accetto condizioni)</span>
                 </label>
             </div>
             
             <button id="btn-enter" disabled onclick="enterApp()" class="w-full bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl opacity-50 cursor-not-allowed transition-all">
-                Entra nella Gallery
+                Entra nell'App
             </button>
         </div>
     </div>
 
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-24 relative">
+        
+        <button onclick="handleSecretAdmin(event)" class="fixed top-6 right-4 z-50 text-wedding-dark/30 hover:text-wedding-dark p-2 transition-colors touch-manipulation">
+            <i data-lucide="user" class="w-6 h-6" id="lock-icon"></i>
+        </button>
+
         <div class="sticky top-0 z-40 w-full bg-[#FAFAFA]/90 backdrop-blur-md pt-8 pb-5 border-b border-gray-100 mb-4 px-4 shadow-sm">
             <header class="text-center max-w-2xl mx-auto">
                 <h2 class="font-serif text-3xl text-wedding-dark mb-4">Live Gallery</h2>
@@ -109,16 +119,15 @@
 
     <div id="preview-modal" class="slide-up-modal fixed inset-0 z-[80] bg-white flex flex-col pt-12 pb-24 px-4">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="font-serif text-2xl text-wedding-dark">Condividi</h3>
+            <h3 class="font-serif text-2xl text-wedding-dark">Le tue foto</h3>
             <button onclick="closePreview()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div id="preview-grid" class="overflow-y-auto grid grid-cols-2 gap-3 mb-4"></div>
-        <div class="mb-4">
-            <input type="text" id="photo-comment" placeholder="Aggiungi una dedica (opzionale)..." class="w-full bg-gray-50 border border-gray-200 text-sm p-4 rounded-xl focus:outline-none focus:border-wedding-gold transition-colors">
-        </div>
+        
+        <div id="preview-grid" class="overflow-y-auto grid grid-cols-2 gap-3 mb-6 p-1"></div>
+        
         <div class="mt-auto">
             <button onclick="startUpload()" id="upload-btn" class="w-full bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-4 rounded-xl flex justify-center items-center gap-2">
-                <i data-lucide="send" class="w-4 h-4"></i> Invia alla Gallery
+                <i data-lucide="send" class="w-4 h-4"></i> Condividi
             </button>
         </div>
     </div>
@@ -139,7 +148,7 @@
             <p id="audio-timer" class="font-mono text-lg text-wedding-dark font-medium mb-4">00:00</p>
             
             <div id="audio-comment-container" class="mb-4 w-full max-w-xs mx-auto hidden">
-                <input type="text" id="audio-comment" placeholder="Il tuo nome o una dedica (opzionale)..." class="w-full bg-white border border-gray-200 text-sm p-3 rounded-xl focus:outline-none focus:border-wedding-gold transition-colors text-center">
+                <input type="text" id="audio-comment" placeholder="Titolo o dedica (opzionale)..." class="w-full bg-white border border-gray-200 text-sm p-3 rounded-xl focus:outline-none focus:border-wedding-gold transition-colors text-center">
             </div>
             
             <button id="send-audio-btn" onclick="processAndUploadAudio()" disabled class="w-full max-w-xs mx-auto bg-wedding-dark text-white font-medium uppercase tracking-widest text-xs py-3 rounded-xl opacity-50 transition-all hidden">
@@ -171,41 +180,38 @@
         </div>
 
         <div class="grid grid-cols-3 gap-6 w-full max-w-xs">
-            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">1</button>
-            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">2</button>
-            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">3</button>
-            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">4</button>
-            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">5</button>
-            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">6</button>
-            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">7</button>
-            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">8</button>
-            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">9</button>
+            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">1</button>
+            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">2</button>
+            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">3</button>
+            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">4</button>
+            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">5</button>
+            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">6</button>
+            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">7</button>
+            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">8</button>
+            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">9</button>
             <div></div>
-            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10">0</button>
-            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest active:text-white">Canc</button>
+            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">0</button>
+            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest active:text-white touch-manipulation">Canc</button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 inset-x-0 bg-white/90 backdrop-blur-md border-t border-gray-100 flex justify-around items-center px-2 py-2 z-[60] pb-safe">
-        <button onclick="closeModals()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100">
-            <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i>
+    <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-100 flex justify-center items-center h-[72px] z-[60] pb-safe gap-14">
+        
+        <button onclick="closeModals()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100 touch-manipulation">
+            <i data-lucide="layout-grid" class="w-6 h-6 mb-1"></i>
             <span class="text-[9px] uppercase tracking-wider font-semibold">Foto</span>
         </button>
 
-        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-gray-300 -mt-5 border-4 border-[#FAFAFA] active:scale-95 transition-transform relative">
-            <i data-lucide="camera" class="w-6 h-6"></i>
-            <div class="absolute bottom-0 right-0 bg-wedding-gold text-white rounded-full w-4 h-4 flex items-center justify-center text-xs font-bold border-2 border-wedding-dark">+</div>
+        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-16 h-16 rounded-full flex items-center justify-center shadow-xl shadow-gray-300 -mt-10 border-4 border-[#FAFAFA] active:scale-95 transition-transform relative z-10 touch-manipulation">
+            <i data-lucide="camera" class="w-7 h-7"></i>
+            <div class="absolute bottom-0 right-0 bg-wedding-gold text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold border-2 border-wedding-dark">+</div>
         </button>
 
-        <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100">
-            <i data-lucide="mic" class="w-5 h-5 mb-1"></i>
+        <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-70 hover:opacity-100 touch-manipulation">
+            <i data-lucide="mic" class="w-6 h-6 mb-1"></i>
             <span class="text-[9px] uppercase tracking-wider font-semibold">Audio</span>
         </button>
 
-        <button onclick="handleSecretAdmin(event)" class="text-wedding-dark flex flex-col items-center w-16 opacity-30 hover:opacity-100">
-            <i data-lucide="lock" class="w-5 h-5 mb-1" id="lock-icon"></i>
-            <span class="text-[9px] uppercase tracking-wider font-semibold">Sposi</span>
-        </button>
     </nav>
 
     <script type="module">
@@ -229,9 +235,11 @@
         let selectedFilesArray = [];
         let globalGalleryData = []; 
         let currentLightboxIndex = 0;
+        let globalGuestName = ""; // Nome dell'ospite
+        
         lucide.createIcons();
 
-        // 1. PRIVACY
+        // 1. PRIVACY E NOME
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -239,6 +247,7 @@
             btn.classList.toggle('cursor-not-allowed', btn.disabled);
         };
         window.enterApp = () => {
+            globalGuestName = document.getElementById('guest-name').value.trim(); // Salva il nome
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
                 document.getElementById('main-app').classList.remove('hidden');
@@ -246,17 +255,22 @@
             }, 600);
         };
 
-        // 2. FOTO UPLOAD
+        // 2. FOTO UPLOAD CON COMMENTO SINGOLO
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
-            selectedFilesArray = files.map(f => ({ file: f, flipped: false }));
+            // Inizializza array con commento vuoto per ogni foto
+            selectedFilesArray = files.map(f => ({ file: f, flipped: false, comment: '' }));
             renderPreviewGrid();
             document.getElementById('preview-modal').classList.add('open');
-            document.getElementById('photo-comment').value = ''; 
             event.target.value = '';
         };
+
+        window.updateSingleComment = (index, val) => {
+            selectedFilesArray[index].comment = val;
+        };
+
         window.renderPreviewGrid = () => {
             const grid = document.getElementById('preview-grid');
             grid.innerHTML = '';
@@ -264,19 +278,23 @@
                 const url = URL.createObjectURL(item.file);
                 const flipClass = item.flipped ? '-scale-x-100' : '';
                 grid.insertAdjacentHTML('beforeend', `
-                    <div class="flex flex-col gap-1 bg-white rounded-lg">
-                        <div class="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                    <div class="flex flex-col gap-1 bg-white rounded-lg border border-gray-100 p-2 shadow-sm">
+                        <div class="relative aspect-square rounded-md overflow-hidden bg-gray-100">
                             <img src="${url}" class="w-full h-full object-cover ${flipClass}">
-                            <button onclick="removeFile(${index})" class="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                            <button onclick="removeFile(${index})" class="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full text-red-500 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
-                        <button onclick="toggleFlip(${index})" class="py-1 text-gray-500 text-[10px] uppercase font-bold flex items-center justify-center gap-1 border border-gray-200 rounded-md mt-1">
-                            <i data-lucide="flip-horizontal" class="w-3 h-3"></i> Specchia
-                        </button>
+                        <div class="flex items-center gap-1 mt-1">
+                            <input type="text" id="comment-${index}" oninput="updateSingleComment(${index}, this.value)" value="${item.comment}" placeholder="Dedica..." class="w-full bg-gray-50 border border-gray-200 text-[10px] p-2 rounded focus:outline-none focus:border-wedding-gold transition-colors">
+                            <button onclick="toggleFlip(${index})" class="shrink-0 p-2 text-gray-500 border border-gray-200 rounded bg-gray-50 hover:bg-gray-100 transition-colors">
+                                <i data-lucide="flip-horizontal" class="w-3 h-3"></i>
+                            </button>
+                        </div>
                     </div>
                 `);
             });
             lucide.createIcons();
         };
+
         window.toggleFlip = (index) => { selectedFilesArray[index].flipped = !selectedFilesArray[index].flipped; renderPreviewGrid(); };
         window.removeFile = (index) => { selectedFilesArray.splice(index, 1); if (selectedFilesArray.length === 0) closePreview(); else renderPreviewGrid(); };
         window.closePreview = () => { document.getElementById('preview-modal').classList.remove('open'); selectedFilesArray = []; };
@@ -304,23 +322,31 @@
         window.startUpload = async () => {
             if (selectedFilesArray.length === 0) return;
             const btn = document.getElementById('upload-btn');
-            const comment = document.getElementById('photo-comment').value.trim();
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Invio...';
             btn.disabled = true;
 
-            for (let item of selectedFilesArray) {
+            for (let i = 0; i < selectedFilesArray.length; i++) {
+                let item = selectedFilesArray[i];
                 try {
                     let fileToUpload = item.flipped ? await getFlippedFile(item.file) : item.file;
                     const formData = new FormData();
                     formData.append("file", fileToUpload);
                     formData.append("upload_preset", UPLOAD_PRESET);
+                    
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                     const data = await res.json();
-                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: comment, timestamp: serverTimestamp() });
+                    
+                    await addDoc(galleryRef, { 
+                        url: data.secure_url, 
+                        type: 'image', 
+                        comment: item.comment, 
+                        guestName: globalGuestName, // Inserisce il nome globale
+                        timestamp: serverTimestamp() 
+                    });
                 } catch (err) { console.error(err); }
             }
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#1A1A1A', '#D4AF37', '#FAFAFA'] });
-            btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Invia alla Gallery';
+            btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Condividi';
             btn.disabled = false;
             closePreview();
         };
@@ -395,7 +421,14 @@
             try {
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
                 const data = await res.json();
-                await addDoc(galleryRef, { url: data.secure_url, type: 'audio', comment: comment, timestamp: serverTimestamp() });
+                
+                await addDoc(galleryRef, { 
+                    url: data.secure_url, 
+                    type: 'audio', 
+                    comment: comment, 
+                    guestName: globalGuestName, 
+                    timestamp: serverTimestamp() 
+                });
 
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1A1A1A'] });
                 document.getElementById('audio-timer').innerText = "00:00";
@@ -426,8 +459,13 @@
             
             const commentContainer = document.getElementById('lightbox-comment-container');
             const commentText = document.getElementById('lightbox-comment');
-            if(item.comment) {
-                commentText.innerText = `"${item.comment}"`;
+            
+            let authorStr = item.guestName ? `<span class="font-bold text-wedding-gold">${item.guestName}</span>` : '';
+            let commentStr = item.comment ? `"${item.comment}"` : '';
+            
+            if(authorStr || commentStr) {
+                let separator = (authorStr && commentStr) ? ': ' : '';
+                commentText.innerHTML = `${authorStr}${separator}${commentStr}`;
                 commentContainer.classList.remove('hidden');
             } else {
                 commentContainer.classList.add('hidden');
@@ -467,12 +505,15 @@
                 const data = doc.data();
                 if (data.type === 'audio') {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
+                    
+                    const audioAuthor = data.guestName ? data.guestName : 'Ospite';
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
+                    
                     const audioHTML = `
                         <div class="photo-reveal bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-center gap-4">
                             <div class="bg-wedding-accent rounded-full p-3 text-wedding-gold shrink-0"><i data-lucide="mic" class="w-5 h-5"></i></div>
                             <div class="flex-grow min-w-0">
-                                <p class="text-xs font-semibold text-wedding-dark mb-1">Messaggio Vocale</p>
+                                <p class="text-xs font-semibold text-wedding-dark mb-1">Vocale di <span class="text-wedding-gold">${audioAuthor}</span></p>
                                 ${audioCommentHtml}
                                 <audio controls controlsList="nodownload" src="${data.url}" class="w-full h-8 scale-[0.85] origin-left"></audio>
                             </div>
@@ -481,12 +522,18 @@
                     `;
                     audioFeed.insertAdjacentHTML('beforeend', audioHTML);
                 } else {
-                    globalGalleryData.push({ url: data.url, comment: data.comment });
+                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName });
                     const currentIndex = photoIndexCounter; 
                     photoIndexCounter++;
 
                     const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
-                    const commentHtml = data.comment ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-2 text-white text-[9px] truncate">${data.comment}</div>` : '';
+                    
+                    let authorText = data.guestName ? `<span class="font-bold text-wedding-gold">${data.guestName}</span>` : '';
+                    let commentPart = data.comment ? `"${data.comment}"` : '';
+                    let separator = (authorText && commentPart) ? ': ' : '';
+                    
+                    const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight"><p class="truncate">${authorText}${separator}${commentPart}</p></div>` : '';
+
                     const imgHTML = `
                         <div class="photo-reveal aspect-square relative overflow-hidden bg-gray-100 rounded-sm cursor-pointer" onclick="openLightbox(${currentIndex})" oncontextmenu="return false;">
                             <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
@@ -527,13 +574,11 @@
             clearTimeout(adminTapTimer);
 
             if (adminTapCount >= 10) {
-                // Chiave segreta sbloccata
                 isSecretUnlocked = true;
                 adminTapCount = 0;
                 confetti({ particleCount: 15, spread: 30, origin: { y: 0.9 }, colors: ['#D4AF37'] }); 
                 openPinModal();
             } else {
-                // Se smette di cliccare prima di arrivare a 10, si apre la trappola (decoy)
                 adminTapTimer = setTimeout(() => {
                     isSecretUnlocked = false;
                     adminTapCount = 0;
@@ -567,12 +612,10 @@
         };
 
         window.checkPin = () => {
-            // Controllo doppio: PIN corretto E Sequenza completata
             if (enteredPin === PIN_CODE && isSecretUnlocked) {
                 confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#D4AF37', '#FAFAFA'] });
                 setTimeout(() => { window.location.href = "admin.html"; }, 800);
             } else {
-                // PIN errato o Sequenza finta
                 failedAttempts++;
                 const dotContainer = document.querySelector('.pin-dot').parentElement;
                 dotContainer.classList.add('translate-x-2');
@@ -581,7 +624,7 @@
                 setTimeout(() => dotContainer.classList.remove('-translate-x-2'), 300);
                 
                 if (failedAttempts >= 3) {
-                    setTimeout(() => window.location.reload(), 500); // 3 errori = reload pagina
+                    setTimeout(() => window.location.reload(), 500); 
                 } else {
                     setTimeout(() => clearPin(), 400);
                 }
