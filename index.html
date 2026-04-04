@@ -6,10 +6,9 @@
     <title>Michela & Maurizio | L'Evento</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <script>
         tailwind.config = {
@@ -32,79 +31,81 @@
     <style>
         body { background-color: #022C22; color: #FDFBF7; -webkit-tap-highlight-color: transparent; }
         
-        /* Animazione Sipario */
-        .curtain-open {
-            animation: slideUpCurtain 1.5s cubic-bezier(0.8, 0, 0.2, 1) forwards;
-        }
-        @keyframes slideUpCurtain {
-            0% { transform: translateY(0); opacity: 1; }
-            100% { transform: translateY(-100%); opacity: 0; pointer-events: none; display: none; }
-        }
+        .curtain-open { animation: slideUpCurtain 1s cubic-bezier(0.8, 0, 0.2, 1) forwards; }
+        @keyframes slideUpCurtain { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-100%); opacity: 0; pointer-events: none; display: none; } }
 
-        /* Archi Architettonici (Statement Shapes) */
-        .arched-photo {
-            border-radius: 50vw 50vw 0 0; /* Crea l'arco perfetto in cima */
-            border: 2px solid #D4AF37; /* Bordo oro */
-            padding: 4px;
-            background: rgba(212, 175, 55, 0.1);
-        }
+        /* Archi per griglia a 3 colonne */
+        .arched-photo { border-radius: 50vw 50vw 0 0; border: 1px solid rgba(212, 175, 55, 0.5); padding: 2px; }
+        .photo-reveal { animation: revealUp 0.6s ease-out forwards; opacity: 0; }
+        @keyframes revealUp { from { opacity: 0; transform: translateY(15px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* Animazione Ingresso Foto */
-        .photo-reveal { animation: revealUp 0.8s ease-out forwards; opacity: 0; }
-        @keyframes revealUp {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* Pulsante Sigillo 3D (Trompe-l'œil) */
-        .seal-button {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.3);
-            background: linear-gradient(135deg, #D4AF37, #B45309);
-        }
+        /* Modal Anteprima stile App */
+        .preview-modal { transform: translateY(100%); transition: transform 0.3s ease-in-out; }
+        .preview-modal.open { transform: translateY(0); }
     </style>
 </head>
-<body class="relative min-h-[100dvh] overflow-x-hidden">
+<body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col">
 
     <div id="welcome-curtain" class="fixed inset-0 z-[100] bg-emerald-950 flex flex-col items-center justify-center p-6 border-8 border-gold-500/20">
         <p class="text-gold-400 font-sans tracking-[0.3em] text-xs uppercase mb-4">Benvenuti all'evento di</p>
         <h1 class="font-cursive text-6xl md:text-7xl text-gold-500 mb-8 text-center drop-shadow-lg">Michela & Maurizio</h1>
-        
-        <button onclick="openCurtain()" class="seal-button text-emerald-950 font-serif font-bold italic px-10 py-4 rounded-full transition-transform active:scale-95 flex items-center gap-2">
+        <button onclick="openCurtain()" class="bg-gradient-to-br from-gold-400 to-gold-600 text-emerald-950 font-serif font-bold italic px-10 py-4 rounded-full shadow-lg shadow-gold-500/20 active:scale-95 transition-transform">
             Entra nel Ricevimento ✦
         </button>
     </div>
 
-    <div id="main-app" class="hidden flex-col items-center w-full min-h-screen px-4 pb-24 pt-8">
+    <div id="main-app" class="hidden flex-col items-center w-full flex-grow px-2 pb-24 pt-6">
         
-        <header class="text-center mb-10">
-            <h2 class="font-cursive text-5xl text-gold-500 mb-2">Live Gallery</h2>
-            <p class="text-stone-400 font-sans text-[10px] uppercase tracking-[0.2em]">Cattura la magia. Adesso.</p>
+        <header class="text-center mb-6 w-full max-w-lg">
+            <h2 class="font-cursive text-4xl text-gold-500 mb-1">Live Gallery</h2>
+            <button onclick="triggerUpload()" class="mt-4 border border-gold-500/50 text-gold-400 text-xs uppercase tracking-widest px-6 py-2 rounded-full mx-auto flex items-center gap-2 active:bg-gold-500/10">
+                <i data-lucide="camera" class="w-4 h-4"></i> Scatta o Scegli
+            </button>
         </header>
 
-        <div id="gallery-grid" class="grid grid-cols-2 gap-x-4 gap-y-8 w-full max-w-md">
-            <p id="empty-state" class="col-span-2 text-center text-stone-500 italic font-serif py-10">
-                L'album è vuoto. Sii il primo a scattare!
-            </p>
-        </div>
-
-        <div class="fixed bottom-8 inset-x-0 flex justify-center z-50 pointer-events-none">
-            <button onclick="document.getElementById('instant-upload').click()" 
-                    class="pointer-events-auto seal-button text-white w-20 h-20 rounded-full flex flex-col items-center justify-center active:scale-90 transition-transform">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-            </button>
-            <input type="file" id="instant-upload" accept="image/*" capture="environment" hidden onchange="handleUpload(event)">
-        </div>
-
-        <div id="status-msg" class="fixed top-4 bg-gold-500 text-emerald-950 font-bold px-6 py-2 rounded-full shadow-lg hidden z-50 animate-pulse">
-            Sviluppo rullino in corso...
+        <div id="gallery-grid" class="grid grid-cols-3 gap-2 w-full max-w-lg mx-auto">
+            <p id="empty-state" class="col-span-3 text-center text-emerald-700 italic font-serif py-10 text-sm">L'album è vuoto. Iniziate voi!</p>
         </div>
     </div>
+
+    <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
+
+    <div id="preview-modal" class="preview-modal fixed inset-0 z-[80] bg-emerald-950 flex flex-col pt-12 pb-24 px-4">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-gold-500 font-serif text-2xl italic">I tuoi scatti</h3>
+            <button onclick="closePreview()" class="text-stone-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        
+        <div id="preview-grid" class="flex-grow overflow-y-auto grid grid-cols-2 gap-4 pb-10">
+            </div>
+
+        <div class="fixed bottom-0 inset-x-0 p-6 bg-emerald-950 border-t border-emerald-900 z-50">
+            <button onclick="startUpload()" id="upload-btn" class="w-full bg-gradient-to-r from-gold-400 to-gold-600 text-emerald-950 font-bold uppercase tracking-widest py-4 rounded-xl shadow-lg shadow-gold-500/20 flex items-center justify-center gap-2">
+                <i data-lucide="upload-cloud" class="w-5 h-5"></i> Conferma & Condividi
+            </button>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 inset-x-0 bg-emerald-950/95 backdrop-blur-md border-t border-gold-500/30 flex justify-around items-center px-2 py-3 z-[60] pb-safe">
+        <button onclick="closePreview()" class="text-gold-400 flex flex-col items-center w-16">
+            <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i>
+            <span class="text-[9px] uppercase tracking-wider font-semibold">Live</span>
+        </button>
+
+        <button onclick="triggerUpload()" class="bg-gradient-to-br from-gold-400 to-gold-600 text-emerald-950 w-14 h-14 rounded-full flex items-center justify-center -mt-6 shadow-[0_0_20px_rgba(212,175,55,0.3)] border-4 border-emerald-950 active:scale-95 transition-transform">
+            <i data-lucide="plus" class="w-6 h-6"></i>
+        </button>
+
+        <button onclick="alert('Area Sposi in arrivo!')" class="text-emerald-700 flex flex-col items-center w-16 hover:text-gold-400 transition-colors">
+            <i data-lucide="lock" class="w-5 h-5 mb-1"></i>
+            <span class="text-[9px] uppercase tracking-wider font-semibold">Sposi</span>
+        </button>
+    </nav>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-        // CONFIGURAZIONE FIREBASE
         const firebaseConfig = {
           apiKey: "AIzaSyAKSDOdxKmz_NmqhuijaNGZXdjLBXnHCU1E",
           authDomain: "fir-config-6e53e.firebaseapp.com",
@@ -117,11 +118,13 @@
         const db = getFirestore(app);
         const galleryRef = collection(db, "live_gallery");
 
-        // CONFIGURAZIONE CLOUDINARY
         const CLOUD_NAME = "dvjgznbzm";
         const UPLOAD_PRESET = "wedding_live_feed";
 
-        // LOGICA UI: Apertura Sipario
+        let selectedFilesArray = [];
+
+        lucide.createIcons();
+
         window.openCurtain = () => {
             document.getElementById('welcome-curtain').classList.add('curtain-open');
             setTimeout(() => {
@@ -130,56 +133,125 @@
             }, 500);
         };
 
-        // Effetto WOW: Coriandoli
-        const fireConfetti = () => {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#FBBF24', '#FFFFFF'] });
+        window.triggerUpload = () => { document.getElementById('file-input').click(); };
+
+        // GESTIONE SELEZIONE FILE E ANTEPRIMA
+        window.handleFileSelection = (event) => {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+            
+            selectedFilesArray = files.map(f => ({ file: f, flipped: false }));
+            renderPreviewGrid();
+            document.getElementById('preview-modal').classList.add('open');
+            event.target.value = ''; // Reset
         };
 
-        // LOGICA DI UPLOAD
-        window.handleUpload = async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+        window.renderPreviewGrid = () => {
+            const grid = document.getElementById('preview-grid');
+            grid.innerHTML = '';
+            
+            selectedFilesArray.forEach((item, index) => {
+                const url = URL.createObjectURL(item.file);
+                const flipClass = item.flipped ? '-scale-x-100' : '';
+                
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="flex flex-col gap-2 bg-emerald-900/50 p-2 rounded-xl border border-gold-500/20">
+                        <div class="relative aspect-[3/4] rounded-lg overflow-hidden bg-emerald-950">
+                            <img src="${url}" class="w-full h-full object-cover transition-transform ${flipClass}">
+                            <button onclick="removeFile(${index})" class="absolute top-1 right-1 bg-emerald-950/80 p-1.5 rounded-full text-rose-400 shadow-md">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <button onclick="toggleFlip(${index})" class="w-full py-2 bg-emerald-800 text-gold-400 rounded-lg text-[10px] uppercase font-bold tracking-widest flex items-center justify-center gap-1 border border-gold-500/30">
+                            <i data-lucide="flip-horizontal" class="w-3 h-3"></i> Specchia
+                        </button>
+                    </div>
+                `);
+            });
+            lucide.createIcons();
+        };
 
-            const status = document.getElementById('status-msg');
-            status.classList.remove('hidden');
+        window.toggleFlip = (index) => {
+            selectedFilesArray[index].flipped = !selectedFilesArray[index].flipped;
+            renderPreviewGrid();
+        };
 
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", UPLOAD_PRESET);
+        window.removeFile = (index) => {
+            selectedFilesArray.splice(index, 1);
+            if (selectedFilesArray.length === 0) closePreview();
+            else renderPreviewGrid();
+        };
 
-            try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
-                const data = await res.json();
+        window.closePreview = () => {
+            document.getElementById('preview-modal').classList.remove('open');
+            selectedFilesArray = [];
+        };
 
-                await addDoc(galleryRef, { url: data.secure_url, timestamp: serverTimestamp() });
+        // FUNZIONE PER RIBALTARE L'IMMAGINE PRIMA DELL'UPLOAD
+        const getFlippedFile = (file) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width; canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.translate(canvas.width, 0); ctx.scale(-1, 1); // Specchio
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: file.type })), file.type);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
 
-                status.classList.add('hidden');
-                event.target.value = ""; 
-                fireConfetti(); // Boom! Festeggiamo lo scatto
-            } catch (err) {
-                console.error(err);
-                alert("Errore di rete. Riprova!");
-                status.classList.add('hidden');
+        // CARICAMENTO FINALE SU CLOUDINARY
+        window.startUpload = async () => {
+            if (selectedFilesArray.length === 0) return;
+            
+            const btn = document.getElementById('upload-btn');
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Sviluppo...';
+            btn.disabled = true;
+
+            for (let item of selectedFilesArray) {
+                try {
+                    let fileToUpload = item.flipped ? await getFlippedFile(item.file) : item.file;
+                    
+                    const formData = new FormData();
+                    formData.append("file", fileToUpload);
+                    formData.append("upload_preset", UPLOAD_PRESET);
+
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+                    const data = await res.json();
+
+                    await addDoc(galleryRef, { url: data.secure_url, timestamp: serverTimestamp() });
+                } catch (err) { console.error("Errore:", err); }
             }
+
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.5 }, colors: ['#D4AF37', '#064E3B', '#FFFFFF'] });
+            
+            btn.innerHTML = '<i data-lucide="upload-cloud" class="w-5 h-5"></i> Conferma & Condividi';
+            btn.disabled = false;
+            closePreview();
         };
 
-        // RENDER LIVE DELLA GALLERIA (con Statement Shapes)
+        // RENDER DELLA GALLERIA (3 Colonne)
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
             const emptyState = document.getElementById("empty-state");
-            
             if (!snapshot.empty && emptyState) emptyState.remove();
             
             gallery.innerHTML = "";
             snapshot.forEach((doc, index) => {
                 const data = doc.data();
-                const optimizedUrl = data.url.replace("/upload/", "/upload/w_500,h_700,c_fill,g_auto,q_auto,f_auto/");
+                const optimizedUrl = data.url.replace("/upload/", "/upload/w_300,h_400,c_fill,g_auto,q_auto,f_auto/");
                 
                 const imgHTML = `
-                    <div class="photo-reveal arched-photo h-48 md:h-64 shadow-2xl relative overflow-hidden group" style="animation-delay: ${index * 0.1}s">
-                        <img src="${optimizedUrl}" class="w-full h-full object-cover rounded-[inherit]">
-                        <div class="absolute inset-0 bg-emerald-900/20 mix-blend-multiply"></div>
+                    <div class="photo-reveal arched-photo aspect-[3/4] relative overflow-hidden bg-emerald-900" style="animation-delay: ${index * 0.05}s">
+                        <img src="${optimizedUrl}" class="w-full h-full object-cover rounded-[inherit] shadow-inner">
                     </div>
                 `;
                 gallery.insertAdjacentHTML('beforeend', imgHTML);
