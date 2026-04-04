@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live Feed | Michela & Maurizio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .photo-grid-item { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-stone-50 text-slate-900 font-sans min-h-screen flex flex-col items-center">
+
+    <header class="w-full py-8 text-center bg-white shadow-sm border-b border-stone-100">
+        <h1 class="text-xl font-light tracking-[0.2em] uppercase text-stone-500">Live Photo Feed</h1>
+        <p class="text-2xl font-serif mt-2">Michela & Maurizio</p>
+        <div class="text-[10px] mt-1 text-rose-400 uppercase tracking-widest">09 Maggio 2026</div>
+    </header>
+
+    <main class="w-full max-w-md px-4 py-8 flex-grow">
+        <div class="sticky top-4 z-50 flex justify-center mb-8">
+            <button onclick="document.getElementById('instant-upload').click()" 
+                    class="bg-rose-500 text-white px-10 py-5 rounded-full shadow-2xl shadow-rose-200 font-bold uppercase tracking-widest active:scale-95 transition-all flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                Condividi un momento
+            </button>
+            <input type="file" id="instant-upload" accept="image/*" capture="environment" hidden onchange="handleUpload(event)">
+        </div>
+
+        <div id="status-msg" class="text-center text-sm text-rose-500 font-medium mb-4 hidden animate-pulse">Invio in corso...</div>
+
+        <div id="gallery-grid" class="grid grid-cols-2 gap-2">
+            </div>
+    </main>
+
+    <footer class="py-6 text-[10px] text-stone-400 uppercase tracking-widest">Digital Event Architect</footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        // CONFIGURAZIONE FIREBASE (Dati estratti dal tuo screenshot) [cite: 1]
+        const firebaseConfig = {
+          apiKey: "AIzaSyAKSDOdxKmz_NmqhuijaNGZXdjLBXnHCU1E",
+          authDomain: "fir-config-6e53e.firebaseapp.com",
+          projectId: "fir-config-6e53e",
+          storageBucket: "fir-config-6e53e.firebasestorage.app",
+          messagingSenderId: "790952608645",
+          appId: "1:790952608645:web:a2f443e7be975ff0dc7aec"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const galleryRef = collection(db, "live_gallery");
+
+        // CONFIGURAZIONE CLOUDINARY (Dati forniti da te) [cite: 352]
+        const CLOUD_NAME = "dvjgznbzm";
+        const UPLOAD_PRESET = "wedding_live_feed";
+
+        // LOGICA DI CARICAMENTO ISTANTANEO
+        window.handleUpload = async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const status = document.getElementById('status-msg');
+            status.classList.remove('hidden');
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            try {
+                // 1. Upload fisico su Cloudinary
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { 
+                    method: "POST", 
+                    body: formData 
+                });
+                const data = await res.json();
+
+                // 2. Registrazione link su Firebase Firestore
+                await addDoc(galleryRef, {
+                    url: data.secure_url,
+                    timestamp: serverTimestamp()
+                });
+
+                status.classList.add('hidden');
+                event.target.value = ""; // Reset input
+            } catch (err) {
+                console.error("Errore di sincronizzazione:", err);
+                alert("Errore durante il caricamento. Riprova!");
+                status.classList.add('hidden');
+            }
+        };
+
+        // SINCRONIZZAZIONE LIVE DELLA GALLERIA [cite: 161, 166]
+        const q = query(galleryRef, orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const gallery = document.getElementById("gallery-grid");
+            gallery.innerHTML = "";
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const imgContainer = document.createElement("div");
+                imgContainer.className = "photo-grid-item bg-stone-200 aspect-square rounded-lg overflow-hidden shadow-sm";
+                
+                // Ottimizzazione Cloudinary al volo: carica versioni leggere per la griglia
+                const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,c_fill,g_auto,q_auto,f_auto/");
+                
+                imgContainer.innerHTML = `<img src="${optimizedUrl}" class="w-full h-full object-cover">`;
+                gallery.appendChild(imgContainer);
+            });
+        });
+    </script>
+</body>
+</html>
