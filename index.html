@@ -136,7 +136,8 @@
 
     <div id="audio-modal" class="slide-up-modal fixed inset-0 z-[80] bg-wedding-accent flex flex-col pt-10 px-6 overflow-y-auto pb-24">
         <div class="flex justify-between items-center w-full mb-4">
-            <div class="w-8"></div> <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-gold transition-colors p-2 rounded-full active:bg-white flex items-center gap-1">
+            <div class="w-8"></div> 
+            <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-gold transition-colors p-2 rounded-full active:bg-white flex items-center gap-1">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i> <span class="text-[9px] uppercase tracking-widest font-semibold">Aggiorna</span>
             </button>
             <button onclick="closeAudio()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
@@ -244,7 +245,6 @@
         
         lucide.createIcons();
 
-        // 0. GESTIONE SESSIONE (Risolve il problema del Reload)
         window.onload = () => {
             const savedSession = sessionStorage.getItem('wedding_session_name');
             if(savedSession) {
@@ -255,19 +255,18 @@
             }
         };
 
-        // 1. PRIVACY E NOME 
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
             btn.classList.toggle('opacity-50', btn.disabled);
             btn.classList.toggle('cursor-not-allowed', btn.disabled);
         };
+        
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             globalGuestName = inputName ? inputName : `Fantasma 👻 #${randomCode}`; 
             
-            // Salva la sessione!
             sessionStorage.setItem('wedding_session_name', globalGuestName);
 
             document.getElementById('privacy-screen').classList.add('fade-out-up');
@@ -277,19 +276,16 @@
             }, 600);
         };
 
-        // TASTO AGGIORNA (Visuale)
         window.forceVisualRefresh = (e) => {
             if(e) {
                 const icon = e.currentTarget.querySelector('i');
                 icon.classList.add('animate-spin');
                 setTimeout(() => icon.classList.remove('animate-spin'), 1000);
             }
-            // Dato che i dati sono già in tempo reale, basta riportare l'utente in cima
             const scrollContainer = document.getElementById('audio-modal').classList.contains('open') ? document.getElementById('audio-modal') : window;
             scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // 2. SISTEMA DEI LIKE 
         window.toggleLike = async (docId, event) => {
             if(event) event.stopPropagation(); 
             
@@ -308,7 +304,6 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
-        // LISTA LIKE (MODAL)
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
             const likesArr = currentLikesMap[docId] || [];
@@ -319,7 +314,6 @@
                 listEl.innerHTML = '<p class="text-gray-400 text-sm text-center font-serif italic mt-4">Nessun like ancora.</p>';
             } else {
                 [...likesArr].reverse().forEach(liker => {
-                    // Pulisce l'ID fantasma (#1234) per la visualizzazione pulita
                     const displayName = liker.startsWith("Fantasma") ? "Un Fantasma 👻" : liker;
                     listEl.insertAdjacentHTML('beforeend', `
                         <div class="flex items-center gap-4 border-b border-gray-50 pb-3">
@@ -357,7 +351,6 @@
         }, {passive: true});
 
 
-        // 3. UPLOAD FOTO
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
@@ -424,6 +417,8 @@
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Invio...';
             btn.disabled = true;
 
+            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
+
             for (let i = 0; i < selectedFilesArray.length; i++) {
                 let item = selectedFilesArray[i];
                 try {
@@ -439,7 +434,7 @@
                         url: data.secure_url, 
                         type: 'image', 
                         comment: item.comment, 
-                        guestName: globalGuestName, 
+                        guestName: finalGuestName, 
                         likes: [],
                         timestamp: serverTimestamp() 
                     });
@@ -513,6 +508,8 @@
             btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block"></i> Salvataggio...';
             btn.disabled = true;
 
+            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
+
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
             const formData = new FormData();
             formData.append("file", audioBlob, "guestbook_audio.webm");
@@ -526,7 +523,7 @@
                     url: data.secure_url, 
                     type: 'audio', 
                     comment: comment, 
-                    guestName: globalGuestName, 
+                    guestName: finalGuestName, 
                     likes: [],
                     timestamp: serverTimestamp() 
                 });
@@ -561,7 +558,6 @@
             const commentContainer = document.getElementById('lightbox-comment-container');
             const commentText = document.getElementById('lightbox-comment');
             
-            // Pulisce l'ID fantasma per la visualizzazione
             const cleanAuthor = item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName;
             
             let authorStr = cleanAuthor ? `<span class="font-bold text-wedding-gold">${cleanAuthor}</span>` : '';
@@ -595,7 +591,7 @@
             if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // 6. RENDER DATABASE
+        // 6. RENDER DATABASE E COLONNE POLAROID
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
@@ -612,7 +608,6 @@
                 
                 currentLikesMap[docId] = data.likes || [];
                 
-                // IL CUORE ROSSO: Ora si basa ESCLUSIVAMENTE sulla variabile isLiked (se l'utente locale ha cliccato)
                 const isLiked = localLikes.includes(docId);
                 const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
                 const imageBadgeHeartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-white';
@@ -675,7 +670,6 @@
                         
                         const otherTxt = (likesCount - 1) > 0 ? ` e altri ${likesCount - 1}` : '';
                         
-                        // Il cuore nel badge immagine è bianco, a meno che tu non abbia messo like
                         likesBadge = `<div class="absolute top-1 left-1 z-20 bg-black/40 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-sm"><i data-lucide="heart" class="w-2.5 h-2.5 ${imageBadgeHeartClass}"></i><span class="text-[7px] text-white font-medium max-w-[60px] truncate">Piace a ${lastLiker}${otherTxt}</span></div>`;
                         
                         if (likesCount === 1) {
@@ -710,7 +704,6 @@
                 }
             });
 
-            // ROMPI IL GHIACCIO (Appare SOLO se è tutto vuoto)
             if (photoIndexCounter === 0) {
                 gallery.innerHTML = `
                     <div class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
@@ -730,7 +723,7 @@
             lucide.createIcons();
         });
 
-        // 7. HONEYPOT PIN PAD
+        // 7. HONEYPOT E PIN PAD
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
         
