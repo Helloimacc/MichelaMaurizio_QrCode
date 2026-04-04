@@ -76,7 +76,13 @@
         <div class="sticky top-0 z-40 w-full bg-[#FAFAFA]/90 backdrop-blur-md pt-6 pb-4 border-b border-gray-100 mb-4 px-4 shadow-sm">
             <header class="text-center max-w-2xl mx-auto flex flex-col items-center">
                 <h1 class="font-serif text-[28px] text-wedding-dark italic leading-none mb-1">Michela <span class="text-wedding-gold">&</span> Maurizio</h1>
-                <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-4 font-semibold">Live Gallery</p>
+                
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-semibold">Live Gallery</p>
+                    <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-gold transition-colors p-1 rounded-full active:bg-gray-100">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    </button>
+                </div>
                 
                 <button onclick="triggerUpload()" class="bg-wedding-dark text-white rounded-full px-6 py-3 font-medium uppercase tracking-widest text-[11px] shadow-lg flex items-center justify-center gap-3 mx-auto active:scale-95 transition-all w-full max-w-xs border border-gray-800">
                     <div class="relative shrink-0">
@@ -129,7 +135,12 @@
     </div>
 
     <div id="audio-modal" class="slide-up-modal fixed inset-0 z-[80] bg-wedding-accent flex flex-col pt-10 px-6 overflow-y-auto pb-24">
-        <button onclick="closeAudio()" class="absolute top-6 right-4 text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="flex justify-between items-center w-full mb-4">
+            <div class="w-8"></div> <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-gold transition-colors p-2 rounded-full active:bg-white flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> <span class="text-[9px] uppercase tracking-widest font-semibold">Aggiorna</span>
+            </button>
+            <button onclick="closeAudio()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
         
         <div class="text-center mb-8 shrink-0">
             <h3 class="font-serif text-3xl text-wedding-dark mb-2">Audio Guestbook</h3>
@@ -229,11 +240,22 @@
         let globalGalleryData = []; 
         let currentLightboxIndex = 0;
         let globalGuestName = ""; 
-        let currentLikesMap = {}; // Salva l'array di like per ogni foto/audio
+        let currentLikesMap = {}; 
         
         lucide.createIcons();
 
-        // 1. PRIVACY E NOME CON SERIALE UNICO
+        // 0. GESTIONE SESSIONE (Risolve il problema del Reload)
+        window.onload = () => {
+            const savedSession = sessionStorage.getItem('wedding_session_name');
+            if(savedSession) {
+                globalGuestName = savedSession;
+                document.getElementById('privacy-screen').style.display = 'none';
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('flex');
+            }
+        };
+
+        // 1. PRIVACY E NOME 
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -242,15 +264,29 @@
         };
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
-            // Genera un ID univoco per chi non mette il nome, risolvendo il problema dei like sovrascritti
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             globalGuestName = inputName ? inputName : `Fantasma 👻 #${randomCode}`; 
             
+            // Salva la sessione!
+            sessionStorage.setItem('wedding_session_name', globalGuestName);
+
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
                 document.getElementById('main-app').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('flex');
             }, 600);
+        };
+
+        // TASTO AGGIORNA (Visuale)
+        window.forceVisualRefresh = (e) => {
+            if(e) {
+                const icon = e.currentTarget.querySelector('i');
+                icon.classList.add('animate-spin');
+                setTimeout(() => icon.classList.remove('animate-spin'), 1000);
+            }
+            // Dato che i dati sono già in tempo reale, basta riportare l'utente in cima
+            const scrollContainer = document.getElementById('audio-modal').classList.contains('open') ? document.getElementById('audio-modal') : window;
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         // 2. SISTEMA DEI LIKE 
@@ -272,7 +308,7 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
-        // LISTA LIKE (MODAL) E GESTIONE SWIPE DOWN
+        // LISTA LIKE (MODAL)
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
             const likesArr = currentLikesMap[docId] || [];
@@ -282,21 +318,20 @@
             if(likesArr.length === 0) {
                 listEl.innerHTML = '<p class="text-gray-400 text-sm text-center font-serif italic mt-4">Nessun like ancora.</p>';
             } else {
-                // Ribalta l'array per mostrare i like più recenti in alto
                 [...likesArr].reverse().forEach(liker => {
+                    // Pulisce l'ID fantasma (#1234) per la visualizzazione pulita
+                    const displayName = liker.startsWith("Fantasma") ? "Un Fantasma 👻" : liker;
                     listEl.insertAdjacentHTML('beforeend', `
                         <div class="flex items-center gap-4 border-b border-gray-50 pb-3">
                             <div class="w-10 h-10 rounded-full bg-wedding-accent flex items-center justify-center text-wedding-gold shrink-0 border border-wedding-gold/20">
                                 <i data-lucide="user" class="w-5 h-5"></i>
                             </div>
-                            <span class="text-sm font-semibold text-wedding-dark">${liker}</span>
+                            <span class="text-sm font-semibold text-wedding-dark">${displayName}</span>
                         </div>
                     `);
                 });
             }
             lucide.createIcons();
-
-            // Mostra Modale e Overlay
             const overlay = document.getElementById('likes-modal-overlay');
             const modal = document.getElementById('likes-modal');
             overlay.classList.remove('hidden');
@@ -312,14 +347,13 @@
             setTimeout(() => overlay.classList.add('hidden'), 300);
         };
 
-        // Chiusura al click fuori o Swipe giù
         document.getElementById('likes-modal-overlay').addEventListener('click', closeLikesModal);
         
         let likesTouchStartY = 0;
         document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.getElementById('likes-modal').addEventListener('touchend', e => {
             let touchEndY = e.changedTouches[0].screenY;
-            if (touchEndY > likesTouchStartY + 60) window.closeLikesModal(); // Swipe verso il basso
+            if (touchEndY > likesTouchStartY + 60) window.closeLikesModal(); 
         }, {passive: true});
 
 
@@ -527,7 +561,10 @@
             const commentContainer = document.getElementById('lightbox-comment-container');
             const commentText = document.getElementById('lightbox-comment');
             
-            let authorStr = item.guestName ? `<span class="font-bold text-wedding-gold">${item.guestName}</span>` : '';
+            // Pulisce l'ID fantasma per la visualizzazione
+            const cleanAuthor = item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName;
+            
+            let authorStr = cleanAuthor ? `<span class="font-bold text-wedding-gold">${cleanAuthor}</span>` : '';
             let commentStr = item.comment ? `"${item.comment}"` : '';
             
             if(authorStr || commentStr) {
@@ -558,7 +595,7 @@
             if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // 6. RENDER DATABASE E COLONNE POLAROID
+        // 6. RENDER DATABASE
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
@@ -573,23 +610,26 @@
                 const data = docSnap.data();
                 const docId = docSnap.id;
                 
-                // Salva i like nell'oggetto globale per la visualizzazione lista
                 currentLikesMap[docId] = data.likes || [];
                 
+                // IL CUORE ROSSO: Ora si basa ESCLUSIVAMENTE sulla variabile isLiked (se l'utente locale ha cliccato)
                 const isLiked = localLikes.includes(docId);
                 const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
+                const imageBadgeHeartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-white';
                 
                 const likesArr = data.likes || [];
                 const likesCount = likesArr.length;
 
                 if (data.type === 'audio') {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
-                    const audioAuthor = data.guestName ? data.guestName : 'Un Fantasma 👻';
+                    const audioAuthorRaw = data.guestName ? data.guestName : 'Fantasma 👻';
+                    const audioAuthor = audioAuthorRaw.startsWith("Fantasma") ? "Un Fantasma 👻" : audioAuthorRaw;
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
                     
-                    let likesText = '';
+                    let likesText = '<span class="text-[9px] text-gray-400 font-medium ml-auto">Sii il primo!</span>';
                     if (likesCount > 0) {
-                        const lastLiker = likesArr[likesArr.length - 1];
+                        const lastLikerRaw = likesArr[likesArr.length - 1];
+                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
                         likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto cursor-pointer" onclick="openLikesModal('${docId}', event)">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
                     }
 
@@ -605,10 +645,10 @@
                             </div>
                             <div class="flex items-center mt-3 pt-3 border-t border-gray-50">
                                 <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform">
-                                    <i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'}"></i>
+                                    <i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>
                                 </button>
                                 ${likesText}
-                                <span class="text-[9px] text-gray-300 ml-auto">${dateStr}</span>
+                                <span class="text-[9px] text-gray-300 ml-3 shrink-0">${dateStr}</span>
                             </div>
                         </div>
                     `;
@@ -619,15 +659,25 @@
                     photoIndexCounter++;
 
                     const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
-                    let authorText = data.guestName ? `<span class="font-bold text-wedding-gold">${data.guestName}</span>` : '';
+                    
+                    const cleanAuthor = data.guestName.startsWith("Fantasma") ? "" : data.guestName;
+                    let authorText = cleanAuthor ? `<span class="font-bold text-wedding-gold">${cleanAuthor}</span>` : '';
                     let commentPart = data.comment ? `"${data.comment}"` : '';
                     let separator = (authorText && commentPart) ? ': ' : '';
-                    
                     const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate">${authorText}${separator}${commentPart}</p></div>` : '';
 
+                    let likesBadge = '';
                     let likesText = '<span class="text-[9px] text-gray-400 font-medium">Sii il primo!</span>';
+                    
                     if (likesCount > 0) {
-                        const lastLiker = likesArr[likesArr.length - 1];
+                        const lastLikerRaw = likesArr[likesArr.length - 1];
+                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
+                        
+                        const otherTxt = (likesCount - 1) > 0 ? ` e altri ${likesCount - 1}` : '';
+                        
+                        // Il cuore nel badge immagine è bianco, a meno che tu non abbia messo like
+                        likesBadge = `<div class="absolute top-1 left-1 z-20 bg-black/40 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-sm"><i data-lucide="heart" class="w-2.5 h-2.5 ${imageBadgeHeartClass}"></i><span class="text-[7px] text-white font-medium max-w-[60px] truncate">Piace a ${lastLiker}${otherTxt}</span></div>`;
+                        
                         if (likesCount === 1) {
                             likesText = `<span class="text-[9px] text-gray-500 font-medium w-full truncate">Piace a <span class="font-bold text-wedding-dark">${lastLiker}</span></span>`;
                         } else {
@@ -638,6 +688,7 @@
                     const imgHTML = `
                         <div class="photo-reveal bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative" oncontextmenu="return false;">
                             <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${currentIndex})">
+                                ${likesBadge}
                                 <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
                                 <div class="absolute inset-0 z-0 no-save"></div>
                                 ${commentHtml}
@@ -659,7 +710,7 @@
                 }
             });
 
-            // ROMPI IL GHIACCIO
+            // ROMPI IL GHIACCIO (Appare SOLO se è tutto vuoto)
             if (photoIndexCounter === 0) {
                 gallery.innerHTML = `
                     <div class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
@@ -679,7 +730,7 @@
             lucide.createIcons();
         });
 
-        // 7. HONEYPOT E PIN PAD AGGIORNATO (Tolleranza calibrata)
+        // 7. HONEYPOT PIN PAD
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
         
@@ -699,7 +750,6 @@
                 openPinModal();
                 adminTapCount = 0; 
             } else {
-                // Aumentata la tolleranza del timer a 800ms per facilitare i 10 tap
                 adminTapTimer = setTimeout(() => {
                     if (adminTapCount > 0) {
                         isSecretUnlocked = false; 
