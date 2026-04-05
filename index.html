@@ -16,10 +16,10 @@
                 extend: {
                     colors: { 
                         wedding: { 
-                            bg: '#FDFBF7', // Crema chiaro
+                            bg: '#FDFBF7', 
                             card: '#FFFFFF',
-                            brown: '#B89470', // Marroncino tasti
-                            sage: '#5D6D5E',  // Verde salvia scuro (invio)
+                            brown: '#B89470', 
+                            sage: '#5D6D5E',  
                             gold: '#D4AF37', 
                             dark: '#2D2926' 
                         } 
@@ -37,6 +37,8 @@
         .no-save { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; pointer-events: none; }
         .touch-manipulation { touch-action: manipulation; }
         .btn-shadow { box-shadow: 0 4px 14px 0 rgba(184, 148, 112, 0.39); }
+        .recording-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
@@ -51,7 +53,7 @@
                 <input type="text" id="guest-name" placeholder="Inserisci il tuo nome" class="w-full bg-wedding-bg border border-gray-100 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center">
                 <label class="flex items-start gap-3 cursor-pointer">
                     <input type="checkbox" id="privacy-check" onchange="toggleEnterBtn()" class="mt-1 w-5 h-5 rounded border-gray-300 text-wedding-brown focus:ring-wedding-brown">
-                    <span class="text-[11px] text-gray-500 leading-tight">Accetto di condividere i miei momenti con gli sposi e gli invitati.</span>
+                    <span class="text-[11px] text-gray-500 leading-tight font-medium">Accetto di condividere i miei momenti con gli sposi e gli invitati. (Privacy Policy)</span>
                 </label>
             </div>
             <button id="btn-enter" disabled onclick="enterApp()" class="w-full bg-wedding-sage text-white font-bold uppercase tracking-widest text-xs py-5 rounded-2xl opacity-50 cursor-not-allowed transition-all shadow-lg">Entra nell'App</button>
@@ -66,134 +68,99 @@
                     <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
                 <button onclick="handleSecretAdmin(event)" class="text-wedding-dark/40 hover:text-wedding-brown transition-colors touch-manipulation">
-                    <i data-lucide="user" class="w-5 h-5" id="lock-icon"></i>
+                    <i data-lucide="user" class="w-6 h-6 transition-transform" id="lock-icon"></i>
                 </button>
             </div>
 
-            <div class="max-w-md mx-auto bg-gradient-to-r from-[#EFE5D8] to-[#F5F0E8] rounded-3xl p-4 flex items-center gap-4 shadow-sm relative overflow-hidden">
-                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-wedding-gold font-serif text-sm border border-wedding-gold/20 shrink-0">GM</div>
+            <div class="max-w-md mx-auto bg-gradient-to-r from-[#EFE5D8] to-[#F5F0E8] rounded-[40px] p-6 flex items-center gap-6 shadow-sm relative overflow-hidden">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-wedding-gold font-serif text-lg border border-wedding-gold/20 shrink-0 shadow-inner">M&M</div>
                 <div class="flex-grow">
-                    <p class="text-[10px] uppercase tracking-tighter font-bold text-wedding-brown">Benvenuti al Matrimonio di</p>
-                    <h2 class="font-serif text-base text-wedding-dark">Michela & Maurizio</h2>
-                    <p class="text-[9px] text-gray-500">14 Settembre 2024</p>
+                    <p class="text-[10px] uppercase tracking-widest font-bold text-wedding-brown mb-1">Wedding Hub</p>
+                    <h2 class="font-serif text-xl text-wedding-dark leading-tight">Michela & Maurizio</h2>
+                    <p class="text-[10px] text-gray-500 font-medium">09 Maggio 2026</p>
                 </div>
-                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md shrink-0">
                     <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop" class="w-full h-full object-cover">
                 </div>
             </div>
 
-            <div class="mt-5 flex flex-col items-center">
-                <button onclick="triggerUpload()" class="bg-wedding-brown text-white rounded-full px-8 py-3.5 font-bold uppercase tracking-widest text-[10px] btn-shadow flex items-center gap-2 active:scale-95 transition-all w-full max-w-xs justify-center">
+            <div class="mt-6 flex flex-col items-center">
+                <button onclick="triggerUpload()" class="bg-wedding-brown text-white rounded-full px-8 py-4 font-bold uppercase tracking-widest text-[10px] btn-shadow flex items-center gap-2 active:scale-95 transition-all w-full max-w-xs justify-center">
                     <i data-lucide="camera" class="w-4 h-4"></i> Carica i tuoi momenti
                 </button>
             </div>
         </div>
 
-        <div id="gallery-grid" class="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto px-4 mt-6"></div>
-    </div>
-
-    <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/40 hidden items-center justify-center p-6 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-xs rounded-3xl p-8 text-center shadow-2xl">
-            <h3 class="font-serif text-xl mb-6 text-wedding-dark">Opzioni</h3>
-            <p class="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Modifica il tuo nome</p>
-            <input type="text" id="edit-guest-name" class="w-full bg-wedding-bg border border-gray-100 text-base font-bold p-4 rounded-2xl mb-6 focus:outline-none focus:border-wedding-brown text-center">
-            <div class="flex flex-col gap-3">
-                <button onclick="saveNewName()" class="w-full bg-wedding-sage text-white font-bold py-4 rounded-2xl text-xs uppercase tracking-widest">Salva Modifiche</button>
-                <button onclick="closeSettings()" class="w-full text-gray-400 py-2 text-[10px] uppercase tracking-widest font-bold">Annulla</button>
-            </div>
-        </div>
-    </div>
-
-    <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 flex justify-center items-center h-[75px] z-[60] pb-safe gap-16">
-        <button onclick="closeModals()" class="text-wedding-dark flex flex-col items-center w-16 opacity-40 hover:opacity-100 touch-manipulation">
-            <i data-lucide="layout-grid" class="w-5 h-5 mb-1"></i>
-            <span class="text-[9px] uppercase tracking-wider font-bold">Foto</span>
-        </button>
-
-        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl -mt-8 border-4 border-wedding-bg active:scale-95 transition-transform touch-manipulation">
-            <i data-lucide="plus" class="w-6 h-6"></i>
-        </button>
-
-        <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-40 hover:opacity-100 touch-manipulation">
-            <i data-lucide="mic" class="w-5 h-5 mb-1"></i>
-            <span class="text-[9px] uppercase tracking-wider font-bold">Audio</span>
-        </button>
-    </nav>
-
-    <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
-
-    <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-black/95 hidden flex-col items-center justify-center touch-none">
-        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 p-2 z-50"><i data-lucide="x" class="w-8 h-8"></i></button>
-        <img id="lightbox-img" src="" class="max-w-full max-h-[75vh] object-contain no-save mb-16" draggable="false">
-        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-6 flex flex-col items-center min-h-[120px]">
-            <p id="lightbox-comment" class="text-wedding-dark text-sm italic mb-4 text-center"></p>
-            <button id="lightbox-likes-btn" class="text-[10px] uppercase font-bold text-gray-500 bg-gray-100 py-3 px-10 rounded-full">Visualizza i mi piace</button>
-        </div>
-    </div>
-
-    <div id="preview-modal" class="slide-up-modal fixed inset-0 z-[80] bg-wedding-bg flex flex-col pt-12 pb-24 px-4">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="font-serif text-2xl">Condividi</h3>
-            <button onclick="closePreview()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
-        </div>
-        <div id="preview-grid" class="overflow-y-auto grid grid-cols-2 gap-4 mb-6"></div>
-        <div class="mt-auto">
-            <button onclick="startUpload()" id="upload-btn" class="w-full bg-wedding-sage text-white font-bold uppercase tracking-widest text-xs py-5 rounded-2xl shadow-lg">Invia alla Gallery</button>
-        </div>
+        <div id="gallery-grid" class="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto px-4 mt-8"></div>
     </div>
 
     <div id="audio-modal" class="slide-up-modal fixed inset-0 z-[80] bg-wedding-bg flex flex-col pt-10 px-6 overflow-y-auto pb-24">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="forceVisualRefresh(event)" class="text-gray-400 p-2"><i data-lucide="refresh-cw" class="w-4 h-4"></i></button>
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="forceVisualRefresh(event)" class="text-gray-400 p-2"><i data-lucide="refresh-cw" class="w-5 h-5"></i></button>
             <h3 class="font-serif text-2xl">Audio Guestbook</h3>
             <button onclick="closeAudio()" class="text-gray-400 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div class="text-center mb-8">
-            <div class="w-24 h-24 mx-auto mb-4">
-                <button id="mic-btn" onclick="toggleRecording()" class="w-full h-full bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-wedding-gold text-wedding-gold"><i data-lucide="mic" class="w-8 h-8" id="mic-icon"></i></button>
+        
+        <div class="text-center mb-10">
+            <div class="w-28 h-28 mx-auto mb-6">
+                <button id="mic-btn" onclick="toggleRecording()" class="w-full h-full bg-white rounded-full flex items-center justify-center shadow-xl border-2 border-wedding-gold text-wedding-gold transition-all">
+                    <i data-lucide="mic" class="w-10 h-10" id="mic-icon"></i>
+                </button>
             </div>
-            <p id="audio-timer" class="font-mono text-lg mb-4">00:00</p>
-            <div id="audio-comment-container" class="mb-4 hidden"><input type="text" id="audio-comment" placeholder="Dedica..." class="w-full bg-white border border-gray-100 p-4 rounded-2xl text-center font-bold"></div>
-            <button id="send-audio-btn" onclick="processAndUploadAudio()" disabled class="w-full bg-wedding-sage text-white font-bold py-4 rounded-2xl hidden uppercase tracking-widest text-xs">Invia Messaggio</button>
+            <p id="audio-timer" class="font-mono text-2xl mb-6 text-wedding-dark">00:00</p>
+            
+            <div id="audio-comment-container" class="mb-6 hidden">
+                <input type="text" id="audio-comment" placeholder="Lascia una dedica..." class="w-full bg-white border border-gray-100 p-5 rounded-3xl text-center font-bold focus:outline-none focus:border-wedding-gold">
+            </div>
+            
+            <button id="send-audio-btn" onclick="processAndUploadAudio()" disabled class="w-full bg-wedding-sage text-white font-bold py-5 rounded-3xl hidden uppercase tracking-widest text-xs shadow-lg">Invia Messaggio</button>
         </div>
-        <div class="h-px bg-gray-100 mb-8"></div>
-        <div id="audio-feed-grid" class="flex flex-col gap-4"></div>
+
+        <div class="h-px bg-gray-100 mb-10"></div>
+        <div id="audio-feed-grid" class="flex flex-col gap-5"></div>
     </div>
 
     <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <i data-lucide="lock" class="w-8 h-8 text-wedding-gold mb-4"></i>
-        <h3 class="font-serif text-white text-xl mb-10">Area Riservata</h3>
+        <h3 class="font-serif text-white text-xl mb-10 text-center">Area Riservata<br><span class="text-[10px] text-wedding-gold uppercase tracking-widest font-sans font-bold">Accesso Sposi</span></h3>
         <div class="flex gap-4 mb-10">
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
         </div>
         <div class="grid grid-cols-3 gap-6 w-full max-w-xs px-8">
-            <button onclick="enterPin('1')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">1</button>
-            <button onclick="enterPin('2')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">2</button>
-            <button onclick="enterPin('3')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">3</button>
-            <button onclick="enterPin('4')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">4</button>
-            <button onclick="enterPin('5')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">5</button>
-            <button onclick="enterPin('6')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">6</button>
-            <button onclick="enterPin('7')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">7</button>
-            <button onclick="enterPin('8')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">8</button>
-            <button onclick="enterPin('9')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">9</button>
+            <button onclick="enterPin('1')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">1</button>
+            <button onclick="enterPin('2')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">2</button>
+            <button onclick="enterPin('3')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">3</button>
+            <button onclick="enterPin('4')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">4</button>
+            <button onclick="enterPin('5')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">5</button>
+            <button onclick="enterPin('6')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">6</button>
+            <button onclick="enterPin('7')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">7</button>
+            <button onclick="enterPin('8')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">8</button>
+            <button onclick="enterPin('9')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">9</button>
             <div class="w-16 h-16"></div>
-            <button onclick="enterPin('0')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10">0</button>
-            <button onclick="clearPin()" class="text-white/50 text-[10px] uppercase font-bold">Canc</button>
+            <button onclick="enterPin('0')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">0</button>
+            <button onclick="clearPin()" class="text-white/50 text-[10px] uppercase font-bold touch-manipulation">Canc</button>
         </div>
     </div>
 
-    <div id="likes-modal-overlay" class="fixed inset-0 z-[130] bg-black/40 hidden opacity-0 transition-opacity"></div>
-    <div id="likes-modal" class="slide-up-modal fixed bottom-0 inset-x-0 z-[140] bg-white rounded-t-[40px] shadow-2xl flex flex-col max-h-[70vh]">
-        <div class="p-6 border-b border-gray-50 flex justify-between items-center">
-            <h3 class="font-serif text-xl pl-2">Piace a...</h3>
-            <button onclick="closeLikesModal()" class="text-gray-300 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
-        </div>
-        <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-4 pb-12"></div>
-    </div>
+    <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-100 flex justify-center items-center h-[80px] z-[60] pb-safe gap-16">
+        <button onclick="closeModals()" class="text-wedding-dark flex flex-col items-center w-16 opacity-40 hover:opacity-100 touch-manipulation">
+            <i data-lucide="layout-grid" class="w-6 h-6 mb-1"></i>
+            <span class="text-[10px] uppercase tracking-wider font-bold">Foto</span>
+        </button>
+        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl -mt-10 border-4 border-wedding-bg active:scale-95 transition-transform touch-manipulation">
+            <i data-lucide="plus" class="w-7 h-7"></i>
+        </button>
+        <button onclick="openAudio()" class="text-wedding-dark flex flex-col items-center w-16 opacity-40 hover:opacity-100 touch-manipulation">
+            <i data-lucide="mic" class="w-6 h-6 mb-1"></i>
+            <span class="text-[10px] uppercase tracking-wider font-bold">Audio</span>
+        </button>
+    </nav>
+
+    <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -215,26 +182,27 @@
 
         let globalGuestName = ""; 
         let selectedFilesArray = [];
-        let globalGalleryData = []; 
-        let currentLightboxIndex = 0;
-        let currentLikesMap = {};
+        let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
+        let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let enteredPin = ""; const PIN_CODE = "2026";
 
         lucide.createIcons();
 
-        // --- GESTIONE NOME E SESSIONE ---
+        // --- SESSIONE ---
         window.onload = () => {
-            const savedSession = sessionStorage.getItem('wedding_session_name');
-            if(savedSession) {
-                globalGuestName = savedSession;
+            const saved = sessionStorage.getItem('wedding_session_name');
+            if(saved) {
+                globalGuestName = saved;
                 document.getElementById('privacy-screen').style.display = 'none';
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('flex');
+                document.getElementById('main-app').classList.replace('hidden', 'flex');
             }
         };
 
         window.toggleEnterBtn = () => {
-            document.getElementById('btn-enter').disabled = !document.getElementById('privacy-check').checked;
-            document.getElementById('btn-enter').classList.toggle('opacity-50', document.getElementById('btn-enter').disabled);
+            const check = document.getElementById('privacy-check').checked;
+            const btn = document.getElementById('btn-enter');
+            btn.disabled = !check;
+            btn.classList.toggle('opacity-50', !check);
+            btn.classList.toggle('cursor-not-allowed', !check);
         };
 
         window.enterApp = () => {
@@ -243,178 +211,177 @@
             sessionStorage.setItem('wedding_session_name', globalGuestName);
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
-                document.getElementById('main-app').classList.remove('hidden');
-                document.getElementById('main-app').classList.add('flex');
+                document.getElementById('main-app').classList.replace('hidden', 'flex');
             }, 600);
         };
 
-        // --- MENU OPZIONI (Settings) ---
-        window.openSettings = () => {
-            document.getElementById('edit-guest-name').value = globalGuestName.includes('#') ? "" : globalGuestName;
-            document.getElementById('settings-modal').classList.remove('hidden');
-            document.getElementById('settings-modal').classList.add('flex');
-        };
-        window.closeSettings = () => { document.getElementById('settings-modal').classList.add('hidden'); };
-        window.saveNewName = () => {
-            let newName = document.getElementById('edit-guest-name').value.trim();
-            if(newName) {
-                globalGuestName = newName;
-                sessionStorage.setItem('wedding_session_name', globalGuestName);
-                closeSettings();
-                confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 }, colors: ['#B89470'] });
-            }
+        // --- AUDIO GUESTBOOK FIX ---
+        window.openAudio = () => { document.getElementById('audio-modal').classList.add('open'); };
+        window.closeAudio = () => { 
+            if(mediaRecorder && mediaRecorder.state === 'recording') toggleRecording();
+            document.getElementById('audio-modal').classList.remove('open'); 
         };
 
-        // --- LOGICA REFRESH ---
-        window.forceVisualRefresh = (e) => {
-            const icon = e.currentTarget.querySelector('i');
-            icon.classList.add('animate-spin');
-            setTimeout(() => icon.classList.remove('animate-spin'), 1000);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+        window.toggleRecording = async () => {
+            const btn = document.getElementById('mic-btn');
+            const icon = document.getElementById('mic-icon');
+            const timerDisplay = document.getElementById('audio-timer');
+            const sendBtn = document.getElementById('send-audio-btn');
+            const commentBox = document.getElementById('audio-comment-container');
 
-        // --- SISTEMA LIKE ---
-        window.toggleLike = async (docId, event) => {
-            if(event) event.stopPropagation();
-            const docRef = doc(db, "live_gallery", docId);
-            const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
-            if (localLikes.includes(docId)) {
-                localStorage.setItem('wedding_likes', JSON.stringify(localLikes.filter(id => id !== docId)));
-                await updateDoc(docRef, { likes: arrayRemove(globalGuestName) });
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                    mediaRecorder.onstop = () => {
+                        sendBtn.classList.replace('hidden', 'block');
+                        commentBox.classList.replace('hidden', 'block');
+                        sendBtn.disabled = false;
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+
+                    mediaRecorder.start();
+                    btn.classList.add('recording-pulse', 'border-red-400');
+                    icon.setAttribute('data-lucide', 'square'); lucide.createIcons();
+                    
+                    seconds = 0;
+                    recordingInterval = setInterval(() => {
+                        seconds++;
+                        let m = Math.floor(seconds / 60).toString().padStart(2, '0');
+                        let s = (seconds % 60).toString().padStart(2, '0');
+                        timerDisplay.innerText = `${m}:${s}`;
+                        if (seconds >= 90) toggleRecording();
+                    }, 1000);
+                } catch (err) { alert("Attiva il microfono nelle impostazioni del browser."); }
             } else {
-                localLikes.push(docId);
-                localStorage.setItem('wedding_likes', JSON.stringify(localLikes));
-                await updateDoc(docRef, { likes: arrayUnion(globalGuestName) });
+                mediaRecorder.stop();
+                clearInterval(recordingInterval);
+                btn.classList.remove('recording-pulse', 'border-red-400');
+                icon.setAttribute('data-lucide', 'mic'); lucide.createIcons();
             }
         };
 
-        window.openLikesModal = (docId, event) => {
-            if(event) event.stopPropagation();
-            const likesArr = currentLikesMap[docId] || [];
-            const listEl = document.getElementById('likes-list');
-            listEl.innerHTML = likesArr.length === 0 ? '<p class="text-gray-400 text-sm text-center italic">Ancora nessun like.</p>' : '';
-            likesArr.reverse().forEach(liker => {
-                listEl.insertAdjacentHTML('beforeend', `
-                    <div class="flex items-center gap-4 bg-wedding-bg p-4 rounded-2xl border border-orange-50">
-                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-wedding-gold shadow-sm">
-                            <i data-lucide="user" class="w-5 h-5"></i>
-                        </div>
-                        <span class="text-sm font-bold text-wedding-dark">${liker}</span>
-                    </div>
-                `);
-            });
-            lucide.createIcons();
-            document.getElementById('likes-modal-overlay').classList.remove('hidden');
-            setTimeout(() => document.getElementById('likes-modal-overlay').classList.remove('opacity-0'), 10);
-            document.getElementById('likes-modal').classList.add('open');
+        window.processAndUploadAudio = async () => {
+            const btn = document.getElementById('send-audio-btn');
+            const comment = document.getElementById('audio-comment').value.trim();
+            btn.innerHTML = "Invio in corso..."; btn.disabled = true;
+
+            const blob = new Blob(audioChunks, { type: 'audio/webm' });
+            const formData = new FormData();
+            formData.append("file", blob, "audio.webm");
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
+                const data = await res.json();
+                await addDoc(galleryRef, { url: data.secure_url, type: 'audio', comment: comment, guestName: globalGuestName, timestamp: serverTimestamp() });
+                confetti({ particleCount: 100, colors: ['#B89470', '#D4AF37'] });
+                closeAudio();
+                document.getElementById('audio-timer').innerText = "00:00";
+            } catch (err) { alert("Errore caricamento audio."); }
+            finally { btn.innerHTML = "Invia Messaggio"; btn.classList.add('hidden'); }
         };
 
-        window.closeLikesModal = () => {
-            document.getElementById('likes-modal-overlay').classList.add('opacity-0');
-            document.getElementById('likes-modal').classList.remove('open');
-            setTimeout(() => document.getElementById('likes-modal-overlay').classList.add('hidden'), 300);
+        // --- AREA RISERVATA 10 TAP FIX ---
+        window.handleSecretAdmin = (e) => {
+            if(e) e.preventDefault();
+            adminTapCount++;
+            
+            const icon = document.getElementById('lock-icon');
+            icon.classList.add('scale-150', 'text-wedding-brown');
+            setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150);
+            
+            clearTimeout(adminTapTimer);
+
+            if (adminTapCount >= 10) {
+                isSecretUnlocked = true; 
+                adminTapCount = 0;
+                confetti({ particleCount: 20, origin: { y: 0.1 }, colors: ['#D4AF37'] }); 
+                openPinModal();
+            } else {
+                adminTapTimer = setTimeout(() => {
+                    if (adminTapCount > 0) {
+                        isSecretUnlocked = false; 
+                        adminTapCount = 0; 
+                        openPinModal(); 
+                    }
+                }, 800); 
+            }
         };
 
-        // --- LIGHTBOX ---
-        window.openLightbox = (index) => {
-            currentLightboxIndex = index;
-            updateLightboxUI();
-            document.getElementById('lightbox-modal').classList.remove('hidden');
-            document.getElementById('lightbox-modal').classList.add('flex');
+        window.openPinModal = () => { 
+            document.getElementById('pin-modal').classList.replace('hidden', 'flex'); 
+            enteredPin = ""; updatePinDots();
         };
-        window.closeLightbox = () => document.getElementById('lightbox-modal').classList.add('hidden');
-        window.updateLightboxUI = () => {
-            const item = globalGalleryData[currentLightboxIndex];
-            document.getElementById('lightbox-img').src = item.url.replace("/upload/", "/upload/w_1200,q_auto/");
-            document.getElementById('lightbox-comment').innerText = item.comment ? `"${item.comment}" - ${item.guestName}` : `Scattata da ${item.guestName}`;
-            const likesCount = item.likes ? item.likes.length : 0;
-            document.getElementById('lightbox-likes-btn').innerText = `Piace a ${likesCount} persone`;
-            document.getElementById('lightbox-likes-btn').onclick = (e) => openLikesModal(item.docId, e);
+        window.closePinModal = () => { document.getElementById('pin-modal').classList.replace('flex', 'hidden'); };
+        window.enterPin = (num) => {
+            if (enteredPin.length < 4) {
+                enteredPin += num; updatePinDots();
+                if (enteredPin.length === 4) {
+                    setTimeout(() => {
+                        if (enteredPin === PIN_CODE && isSecretUnlocked) {
+                            window.location.href = "admin.html";
+                        } else {
+                            const dots = document.querySelector('.pin-dot').parentElement;
+                            dots.classList.add('animate-bounce');
+                            setTimeout(() => { dots.classList.remove('animate-bounce'); enteredPin = ""; updatePinDots(); }, 500);
+                        }
+                    }, 300);
+                }
+            }
         };
+        window.updatePinDots = () => {
+            const dots = document.querySelectorAll('.pin-dot');
+            dots.forEach((d, i) => d.classList.toggle('bg-wedding-gold', i < enteredPin.length));
+        };
+        window.clearPin = () => { enteredPin = ""; updatePinDots(); };
 
-        // --- UPLOAD ---
+        // --- UPLOAD FOTO ---
         window.triggerUpload = () => document.getElementById('file-input').click();
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
-            selectedFilesArray = files.map(f => ({ file: f, flipped: false, comment: '' }));
-            renderPreviewGrid();
-            document.getElementById('preview-modal').classList.add('open');
+            selectedFilesArray = files.map(f => ({ file: f, comment: '' }));
+            document.getElementById('main-app').insertAdjacentHTML('afterend', '<div id="temp-load" class="fixed inset-0 z-[200] bg-black/20 flex items-center justify-center backdrop-blur-sm text-white font-bold">Preparazione...</div>');
+            startUpload();
         };
-        window.renderPreviewGrid = () => {
-            const grid = document.getElementById('preview-grid');
-            grid.innerHTML = '';
-            selectedFilesArray.forEach((item, index) => {
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="bg-white rounded-3xl p-3 shadow-sm border border-orange-50">
-                        <div class="aspect-square rounded-2xl overflow-hidden mb-2">
-                            <img src="${URL.createObjectURL(item.file)}" class="w-full h-full object-cover">
-                        </div>
-                        <input type="text" oninput="selectedFilesArray[${index}].comment = this.value" placeholder="Dedica..." class="w-full bg-wedding-bg text-[10px] p-3 rounded-xl focus:outline-none">
-                    </div>
-                `);
-            });
-        };
+
         window.startUpload = async () => {
-            const btn = document.getElementById('upload-btn');
-            btn.innerHTML = "Caricamento..."; btn.disabled = true;
             for (let item of selectedFilesArray) {
                 const formData = new FormData();
                 formData.append("file", item.file);
                 formData.append("upload_preset", UPLOAD_PRESET);
                 const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                 const data = await res.json();
-                await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: item.comment, guestName: globalGuestName, likes: [], timestamp: serverTimestamp() });
+                await addDoc(galleryRef, { url: data.secure_url, type: 'image', guestName: globalGuestName, timestamp: serverTimestamp() });
             }
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#B89470', '#5D6D5E'] });
-            btn.innerHTML = "Invia alla Gallery"; btn.disabled = false; closePreview();
+            const loader = document.getElementById('temp-load'); if(loader) loader.remove();
+            confetti({ particleCount: 50, colors: ['#B89470'] });
         };
 
         // --- RENDER REALTIME ---
-        const q = query(galleryRef, orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
+        onSnapshot(query(galleryRef, orderBy("timestamp", "desc")), (snap) => {
             const gallery = document.getElementById("gallery-grid");
             const audioFeed = document.getElementById("audio-feed-grid");
-            globalGalleryData = [];
-            const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
-            
-            // Smart DOM update basic
             gallery.innerHTML = ""; audioFeed.innerHTML = "";
             
-            snapshot.forEach((docSnap) => {
-                const data = docSnap.data();
-                const docId = docSnap.id;
-                currentLikesMap[docId] = data.likes || [];
-                const likesCount = (data.likes || []).length;
-                const isLiked = localLikes.includes(docId);
-
+            snap.forEach((doc) => {
+                const data = doc.data();
                 if (data.type === 'image') {
-                    const idx = globalGalleryData.length;
-                    globalGalleryData.push({...data, docId});
                     gallery.insertAdjacentHTML('beforeend', `
-                        <div class="bg-white rounded-[32px] overflow-hidden shadow-sm border border-orange-50 flex flex-col p-2 photo-reveal">
-                            <div class="aspect-square rounded-[24px] overflow-hidden cursor-pointer" onclick="openLightbox(${idx})">
-                                <img src="${data.url.replace('/upload/', '/upload/w_400,c_fill,q_auto/')}" class="w-full h-full object-cover">
-                            </div>
-                            <div class="p-2 flex items-center justify-between">
-                                <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-125 transition-transform">
-                                    <i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-300'}"></i>
-                                </button>
-                                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">${likesCount} mi piace</span>
-                            </div>
+                        <div class="bg-white rounded-[32px] overflow-hidden shadow-sm border border-orange-50 p-2">
+                            <img src="${data.url.replace('/upload/', '/upload/w_400,c_fill,q_auto/')}" class="aspect-square w-full object-cover rounded-[24px]">
+                            <p class="text-[8px] text-gray-400 mt-2 px-2 font-bold uppercase truncate">${data.guestName}</p>
                         </div>
                     `);
                 } else {
                     audioFeed.insertAdjacentHTML('beforeend', `
-                        <div class="bg-white rounded-3xl p-4 shadow-sm border border-orange-50">
-                            <div class="flex items-center gap-3 mb-3">
-                                <div class="w-10 h-10 bg-wedding-bg rounded-full flex items-center justify-center text-wedding-brown"><i data-lucide="mic" class="w-5 h-5"></i></div>
-                                <div><p class="text-xs font-bold">${data.guestName}</p><p class="text-[10px] text-gray-400 italic">${data.comment || 'Messaggio vocale'}</p></div>
-                            </div>
-                            <audio controls src="${data.url}" class="w-full h-8 scale-90"></audio>
-                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50 px-2">
-                                <button onclick="toggleLike('${docId}', event)"><i data-lucide="heart" class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-300'}"></i></button>
-                                <span class="text-[9px] font-bold text-gray-400 uppercase">${likesCount} Like</span>
-                            </div>
+                        <div class="bg-white rounded-[32px] p-5 shadow-sm border border-orange-50">
+                            <p class="text-xs font-bold mb-1 text-wedding-brown">${data.guestName}</p>
+                            <p class="text-[10px] text-gray-400 italic mb-3">${data.comment || ''}</p>
+                            <audio controls src="${data.url}" class="w-full h-8"></audio>
                         </div>
                     `);
                 }
@@ -422,15 +389,9 @@
             lucide.createIcons();
         });
 
-        // --- ADMIN & MISC ---
-        window.closeModals = () => { document.getElementById('preview-modal').classList.remove('open'); document.getElementById('audio-modal').classList.remove('open'); };
-        window.closePreview = () => document.getElementById('preview-modal').classList.remove('open');
-        window.openAudio = () => document.getElementById('audio-modal').classList.add('open');
-        window.closeAudio = () => document.getElementById('audio-modal').classList.remove('open');
-        window.closePinModal = () => document.getElementById('pin-modal').classList.add('hidden');
-
-        // (Logica Admin 10 tap e Audio Recorder rimangono le stesse dei messaggi precedenti per brevità, assicurati di averle nel tuo index finale)
-        // ... (resto della logica audio recording e admin tap)
+        window.closeModals = () => { document.getElementById('audio-modal').classList.remove('open'); };
+        window.forceVisualRefresh = () => window.location.reload();
+        window.openSettings = () => { const n = prompt("Cambia il tuo nome:", globalGuestName); if(n) { globalGuestName = n; sessionStorage.setItem('wedding_session_name', n); } };
     </script>
 </body>
 </html>
