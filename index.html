@@ -105,10 +105,15 @@
         <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-4 z-50 transition-colors"><i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i></button>
         <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white p-4 z-50 transition-colors"><i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i></button>
 
-        <img id="lightbox-img" src="" class="max-w-full max-h-[85vh] object-contain transition-transform duration-300 no-save" draggable="false">
+        <img id="lightbox-img" src="" class="max-w-full max-h-[75vh] object-contain transition-transform duration-300 no-save mb-16" draggable="false">
         
-        <div id="lightbox-comment-container" class="absolute bottom-10 inset-x-0 flex justify-center hidden">
-            <p id="lightbox-comment" class="text-white/90 text-sm italic text-center px-6 py-2 bg-black/50 rounded-full backdrop-blur-sm max-w-sm"></p>
+        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl shadow-2xl p-5 flex flex-col items-center z-50 min-h-[110px] justify-center">
+            <div id="lightbox-comment-container" class="mb-3 hidden w-full text-center px-4">
+                <p id="lightbox-comment" class="text-wedding-dark text-sm italic leading-tight"></p>
+            </div>
+            <button id="lightbox-likes-btn" class="text-[10px] uppercase tracking-widest font-bold text-gray-600 bg-gray-100 py-2.5 px-8 rounded-full active:scale-95 transition-transform hidden">
+                Visualizza i mi piace
+            </button>
         </div>
     </div>
 
@@ -174,10 +179,7 @@
     <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <i data-lucide="lock" class="w-8 h-8 text-wedding-gold mb-4"></i>
-        
-        <h3 class="font-sans tracking-widest uppercase text-white text-sm mb-8 text-center">
-            Area Riservata<br><span class="text-[10px] text-wedding-gold">agli sposi</span>
-        </h3>
+        <h3 class="font-sans tracking-widest uppercase text-white text-sm mb-8 text-center">Area Riservata<br><span class="text-[10px] text-wedding-gold">agli sposi</span></h3>
         
         <div class="flex gap-4 mb-10">
             <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
@@ -245,7 +247,7 @@
         
         lucide.createIcons();
 
-        // 0. GESTIONE SESSIONE (Evita di richiedere il nome se si ricarica la pagina)
+        // SESSIONE
         window.onload = () => {
             const savedSession = sessionStorage.getItem('wedding_session_name');
             if(savedSession) {
@@ -256,7 +258,7 @@
             }
         };
 
-        // 1. PRIVACY E NOME 
+        // PRIVACY E NOME 
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
@@ -277,7 +279,6 @@
             }, 600);
         };
 
-        // TASTO AGGIORNA VISUALE
         window.forceVisualRefresh = (e) => {
             if(e) {
                 const icon = e.currentTarget.querySelector('i');
@@ -288,7 +289,7 @@
             scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // 2. SISTEMA DEI LIKE 
+        // SISTEMA DEI LIKE 
         window.toggleLike = async (docId, event) => {
             if(event) event.stopPropagation(); 
             
@@ -307,7 +308,6 @@
             } catch (e) { console.log("Errore aggiornamento like", e); }
         };
 
-        // LISTA LIKE (MODAL)
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
             const likesArr = currentLikesMap[docId] || [];
@@ -354,7 +354,7 @@
             if (touchEndY > likesTouchStartY + 60) window.closeLikesModal(); 
         }, {passive: true});
 
-        // 3. UPLOAD FOTO E ANTEPRIMA
+        // UPLOAD FOTO
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
@@ -450,7 +450,7 @@
             closePreview();
         };
 
-        // 4. AUDIO LOGIC
+        // AUDIO LOGIC
         let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
         window.openAudio = () => { document.getElementById('audio-modal').classList.add('open'); };
         window.closeAudio = () => { 
@@ -540,7 +540,7 @@
             finally { btn.classList.add('hidden'); }
         };
 
-        // 5. LIGHTBOX
+        // LIGHTBOX E AGGIORNAMENTO BOTTONE LIKE INTERNO
         window.openLightbox = (index) => {
             currentLightboxIndex = index;
             updateLightboxUI();
@@ -563,7 +563,6 @@
             const commentText = document.getElementById('lightbox-comment');
             
             const cleanAuthor = item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName;
-            
             let authorStr = cleanAuthor ? `<span class="font-bold text-wedding-gold">${cleanAuthor}</span>` : '';
             let commentStr = item.comment ? `"${item.comment}"` : '';
             
@@ -573,6 +572,18 @@
                 commentContainer.classList.remove('hidden');
             } else {
                 commentContainer.classList.add('hidden');
+            }
+
+            // Aggiorna il bottone "Visualizza i mi piace" nella barra bianca
+            const likesCount = item.likes ? item.likes.length : 0;
+            const lightboxLikesBtn = document.getElementById('lightbox-likes-btn');
+            
+            if(likesCount > 0) {
+                lightboxLikesBtn.innerHTML = `Visualizza ${likesCount} mi piace`;
+                lightboxLikesBtn.onclick = (e) => openLikesModal(item.docId, e);
+                lightboxLikesBtn.classList.remove('hidden');
+            } else {
+                lightboxLikesBtn.classList.add('hidden');
             }
         };
         window.prevLightbox = (e) => {
@@ -595,13 +606,12 @@
             if (touchEndX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // 6. MOTORE SMART DOM UPDATE (Nessun Lampeggio o Salto dello schermo)
+        // MOTORE SMART DOM UPDATE (Solo Contatori Numerici)
         const q = query(galleryRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
             const audioFeed = document.getElementById("audio-feed-grid");
             
-            // Se ci sono dati, elimina i messaggi di stato vuoto
             if (!snapshot.empty) {
                 const es1 = document.getElementById("empty-state");
                 if (es1) es1.remove();
@@ -612,7 +622,6 @@
             globalGalleryData = []; 
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
 
-            // Pulizia: Rimuove dal DOM gli elementi eliminati (Es. cancellati dall'admin)
             const currentDocIds = snapshot.docs.map(doc => "card-" + doc.id);
             Array.from(gallery.children).forEach(child => {
                 if (child.id && child.id.startsWith('card-') && !currentDocIds.includes(child.id)) child.remove();
@@ -628,14 +637,12 @@
                 const data = docSnap.data();
                 const docId = docSnap.id;
                 
-                currentLikesMap[docId] = data.likes || [];
                 const likesArr = data.likes || [];
+                currentLikesMap[docId] = likesArr;
                 const likesCount = likesArr.length;
                 
-                // Il cuore è rosso SOLO se l'utente attuale (il suo browser locale) ha messo like
                 const isLiked = localLikes.includes(docId);
                 const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
-                const imageBadgeHeartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-white';
 
                 if (data.type === 'audio') {
                     const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Ora';
@@ -643,14 +650,11 @@
                     const audioAuthor = audioAuthorRaw.startsWith("Fantasma") ? "Un Fantasma 👻" : audioAuthorRaw;
                     const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
                     
-                    let likesText = '<span class="text-[9px] text-gray-400 font-medium ml-auto">Sii il primo!</span>';
+                    let likesText = `<span class="text-[10px] text-gray-400 font-medium ml-auto">0 mi piace</span>`;
                     if (likesCount > 0) {
-                        const lastLikerRaw = likesArr[likesArr.length - 1];
-                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
-                        likesText = `<span class="text-[9px] text-gray-400 font-medium ml-auto cursor-pointer" onclick="openLikesModal('${docId}', event)">Piace a ${lastLiker} ${likesCount > 1 ? `e altri ${likesCount - 1}` : ''}</span>`;
+                        likesText = `<span class="text-[10px] text-wedding-dark font-semibold ml-auto cursor-pointer" onclick="openLikesModal('${docId}', event)">${likesCount} mi piace</span>`;
                     }
 
-                    // Se non esiste la card, la crea. Altrimenti l'aggiorna.
                     let card = document.getElementById(`card-${docId}`);
                     if (!card) {
                         card = document.createElement('div');
@@ -670,16 +674,13 @@
                                     <i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>
                                 </button>
                                 <div id="text-like-${docId}" class="ml-auto flex items-center">${likesText}</div>
-                                <span class="text-[9px] text-gray-300 ml-3 shrink-0">${dateStr}</span>
                             </div>
                         `;
                     } else {
-                        // Aggiorna solo le parti volatili (I Cuori) senza far lampeggiare l'immagine
                         document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>`;
                         document.getElementById(`text-like-${docId}`).innerHTML = likesText;
                     }
 
-                    // Assicura l'ordine corretto nel DOM
                     if (audioFeed.children[audioIndex] !== card) {
                         audioFeed.insertBefore(card, audioFeed.children[audioIndex]);
                     }
@@ -687,7 +688,8 @@
 
                 } else {
                     const pIndex = globalGalleryData.length;
-                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName });
+                    // Passo anche il docId e l'array likes per farli leggere alla Lightbox
+                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName, docId: docId, likes: likesArr });
                     
                     const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
                     const cleanAuthor = data.guestName.startsWith("Fantasma") ? "" : data.guestName;
@@ -696,21 +698,9 @@
                     let separator = (authorText && commentPart) ? ': ' : '';
                     const commentHtml = (authorText || commentPart) ? `<div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 pt-6 text-white text-[9px] leading-tight z-10"><p class="truncate pr-6">${authorText}${separator}${commentPart}</p></div>` : '';
 
-                    let likesBadge = '';
-                    let likesText = '<span class="text-[9px] text-gray-400 font-medium">Sii il primo!</span>';
-                    
+                    let likesText = `<span class="text-[10px] text-gray-400 font-medium">0 mi piace</span>`;
                     if (likesCount > 0) {
-                        const lastLikerRaw = likesArr[likesArr.length - 1];
-                        const lastLiker = lastLikerRaw.startsWith("Fantasma") ? "un Fantasma 👻" : lastLikerRaw;
-                        const otherTxt = (likesCount - 1) > 0 ? ` e altri ${likesCount - 1}` : '';
-                        
-                        likesBadge = `<div class="absolute top-1 left-1 z-20 bg-black/40 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-sm"><i data-lucide="heart" class="w-2.5 h-2.5 ${imageBadgeHeartClass}"></i><span class="text-[7px] text-white font-medium max-w-[60px] truncate">Piace a ${lastLiker}${otherTxt}</span></div>`;
-                        
-                        if (likesCount === 1) {
-                            likesText = `<span class="text-[9px] text-gray-500 font-medium w-full truncate">Piace a <span class="font-bold text-wedding-dark">${lastLiker}</span></span>`;
-                        } else {
-                            likesText = `<span class="text-[9px] text-gray-500 font-medium w-full truncate">Piace a <span class="font-bold text-wedding-dark">${lastLiker}</span> e altri ${likesCount - 1}</span>`;
-                        }
+                        likesText = `<span class="text-[10px] text-wedding-dark font-semibold">${likesCount} mi piace</span>`;
                     }
 
                     let card = document.getElementById(`card-${docId}`);
@@ -721,7 +711,6 @@
                         card.setAttribute("oncontextmenu", "return false;");
                         card.innerHTML = `
                             <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="openLightbox(${pIndex})" id="img-container-${docId}">
-                                <div id="badge-container-${docId}">${likesBadge}</div>
                                 <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
                                 <div class="absolute inset-0 z-0 no-save"></div>
                                 ${commentHtml}
@@ -731,18 +720,21 @@
                                     <button onclick="toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0" id="btn-like-${docId}">
                                         <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
                                     </button>
-                                    <div class="flex-grow min-w-0 pr-1 flex items-center cursor-pointer active:opacity-50" onclick="openLikesModal('${docId}', event)" id="text-like-${docId}">
+                                    <div class="flex-grow min-w-0 pr-1 flex items-center" id="text-like-${docId}">
                                         ${likesText}
                                     </div>
                                 </div>
                             </div>
                         `;
                     } else {
-                        // Aggiorna dinamicamente senza ricaricare l'immagine
                         document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>`;
                         document.getElementById(`text-like-${docId}`).innerHTML = likesText;
-                        document.getElementById(`badge-container-${docId}`).innerHTML = likesBadge;
                         document.getElementById(`img-container-${docId}`).setAttribute("onclick", `openLightbox(${pIndex})`);
+                        
+                        // Aggiorna anche la lightbox in tempo reale se è attualmente aperta su questa foto
+                        if(document.getElementById('lightbox-modal').classList.contains('flex') && currentLightboxIndex === pIndex) {
+                            updateLightboxUI();
+                        }
                     }
 
                     if (gallery.children[imageIndex] !== card) {
@@ -752,7 +744,6 @@
                 }
             });
 
-            // Se la galleria è interamente vuota, rimetti i box Rompighiaccio
             if (imageIndex === 0) {
                 gallery.innerHTML = `
                     <div id="empty-state" class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
@@ -769,12 +760,10 @@
                     </div>
                 `;
             }
-            
-            // Riattiva le icone solo per gli elementi aggiornati
             lucide.createIcons();
         });
 
-        // 7. HONEYPOT E PIN PAD 
+        // 7. HONEYPOT PIN PAD
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
         window.openPinModal = () => { document.getElementById('pin-modal').classList.remove('hidden'); document.getElementById('pin-modal').classList.add('flex'); clearPin(); };
         
