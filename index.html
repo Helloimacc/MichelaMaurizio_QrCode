@@ -42,8 +42,6 @@
         .touch-manipulation { touch-action: manipulation; }
         .btn-shadow { box-shadow: 0 4px 14px 0 rgba(184, 148, 112, 0.39); }
         .custom-checkbox:checked { background-color: #B89470; border-color: #B89470; }
-        .recording-pulse { animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
@@ -65,7 +63,8 @@
         </div>
     </div>
 
-    <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-24 relative">
+    <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-10 relative">
+        
         <div class="sticky top-0 z-40 w-full bg-wedding-bg/95 backdrop-blur-md pt-4 pb-4 px-4 border-b border-orange-50 shadow-sm">
             <div class="flex justify-between items-center max-w-2xl mx-auto mb-4 px-2">
                 <button onclick="openSettings()" class="text-wedding-dark/40 hover:text-wedding-brown transition-colors p-2 flex items-center gap-2 touch-manipulation">
@@ -75,6 +74,7 @@
                     <i data-lucide="user" class="w-5 h-5 transition-transform" id="lock-icon"></i>
                 </button>
             </div>
+
             <div class="max-w-md mx-auto bg-gradient-to-r from-[#EFE5D8] to-[#F5F0E8] rounded-[40px] p-6 flex items-center gap-6 shadow-sm relative overflow-hidden">
                 <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-wedding-gold font-serif text-lg border border-wedding-gold/20 shrink-0 shadow-inner">M&M</div>
                 <div class="flex-grow">
@@ -86,6 +86,7 @@
                     <img src="https://res.cloudinary.com/dvjgznbzm/image/upload/v1775465246/IMG_2955_vczlqf.jpg" class="w-full h-full object-cover">
                 </div>
             </div>
+
             <div class="mt-6 flex flex-row items-center justify-center gap-4 max-w-2xl mx-auto px-4 relative">
                 <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-brown p-2.5 rounded-full active:bg-gray-100 transition-colors shrink-0 border border-gray-100 bg-white shadow-sm">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -95,49 +96,9 @@
                 </button>
             </div>
         </div>
+
         <div id="gallery-grid" class="grid grid-cols-2 gap-4 w-full max-w-2xl mx-auto px-4 mt-8"></div>
     </div>
-
-    <div id="audio-app" class="hidden flex-col items-center w-full flex-grow pb-24 relative">
-        <div class="sticky top-0 z-40 w-full bg-wedding-bg/95 backdrop-blur-md pt-4 pb-4 px-4 border-b border-orange-50 shadow-sm">
-            <div class="flex justify-between items-center max-w-2xl mx-auto mb-4 px-2">
-                <button onclick="openSettings()" class="text-wedding-dark/40 hover:text-wedding-brown transition-colors p-2 flex items-center gap-2 touch-manipulation">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </button>
-                <button onclick="handleSecretAdmin(event)" class="text-wedding-dark/40 hover:text-wedding-brown transition-colors p-2 touch-manipulation">
-                    <i data-lucide="user" class="w-5 h-5 transition-transform"></i>
-                </button>
-            </div>
-            <header class="text-center max-w-2xl mx-auto flex flex-col items-center">
-                <h1 class="font-serif text-[28px] text-wedding-dark italic leading-none mb-1">Michela <span class="text-wedding-gold">&</span> Maurizio</h1>
-                <div class="flex items-center justify-center gap-3 mb-2">
-                    <p class="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-semibold">Audio Guestbook</p>
-                    <button onclick="forceVisualRefresh(event)" class="text-gray-400 hover:text-wedding-gold transition-colors p-1 rounded-full active:bg-gray-100">
-                        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
-                    </button>
-                </div>
-            </header>
-        </div>
-
-        <div class="w-full max-w-2xl mx-auto px-4 mt-6">
-            <div class="text-center mb-10">
-                <p class="text-sm text-gray-500 mb-6">Lascia un messaggio vocale agli sposi.<br>Hai 90 secondi.</p>
-                <div class="w-28 h-28 mx-auto mb-6">
-                    <button id="mic-btn" onclick="toggleRecording()" class="w-full h-full bg-white rounded-full flex items-center justify-center shadow-xl border-2 border-wedding-gold text-wedding-gold transition-all">
-                        <i data-lucide="mic" class="w-10 h-10" id="mic-icon"></i>
-                    </button>
-                </div>
-                <p id="audio-timer" class="font-mono text-2xl mb-6 text-wedding-dark">00:00</p>
-                <div id="audio-comment-container" class="mb-6 hidden">
-                    <input type="text" id="audio-comment" placeholder="Dedica (opzionale)..." class="w-full bg-white border border-gray-100 p-5 rounded-3xl text-center font-bold focus:outline-none focus:border-wedding-gold">
-                </div>
-                <button id="send-audio-btn" onclick="processAndUploadAudio()" disabled class="w-full bg-wedding-sage text-white font-bold py-5 rounded-3xl hidden uppercase tracking-widest text-xs shadow-lg">Invia Messaggio</button>
-            </div>
-            <div class="h-px bg-gray-200 mb-10"></div>
-            <div id="audio-feed-grid" class="flex flex-col gap-5"></div>
-        </div>
-    </div>
-
 
     <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/40 hidden items-center justify-center p-6 backdrop-blur-sm">
         <div class="bg-white w-full max-w-xs rounded-3xl p-8 text-center shadow-2xl">
@@ -152,13 +113,13 @@
     </div>
 
     <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-black/95 hidden flex-col items-center justify-center touch-none">
-        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 hover:text-white p-2 z-50 transition-colors"><i data-lucide="x" class="w-8 h-8"></i></button>
-        <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50 transition-colors"><i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i></button>
-        <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50 transition-colors"><i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i></button>
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 p-2 z-50"><i data-lucide="x" class="w-8 h-8"></i></button>
+        <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50"><i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i></button>
+        <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50"><i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i></button>
 
         <img id="lightbox-img" src="" class="max-w-full max-h-[70vh] object-contain no-save mb-[120px]" draggable="false">
         
-        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.3)] p-6 flex flex-col items-center min-h-[120px] justify-center z-50">
+        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl shadow-2xl p-6 flex flex-col items-center min-h-[120px] justify-center z-50">
             <div id="lightbox-comment-container" class="mb-4 hidden w-full text-center">
                 <p id="lightbox-comment" class="text-wedding-dark text-sm italic leading-tight"></p>
             </div>
@@ -190,49 +151,33 @@
         </div>
     </div>
 
-    <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
+    <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <i data-lucide="lock" class="w-8 h-8 text-wedding-gold mb-4"></i>
-        <h3 class="font-sans tracking-widest uppercase text-white text-sm mb-8 text-center">Area Riservata<br><span class="text-[10px] text-wedding-gold">agli sposi</span></h3>
+        <h3 class="font-serif text-white text-xl mb-10 text-center">Area Riservata</h3>
         <div class="flex gap-4 mb-10">
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
-            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
+            <div class="w-4 h-4 rounded-full border border-wedding-gold pin-dot"></div>
         </div>
         <div class="grid grid-cols-3 gap-6 w-full max-w-xs px-8">
-            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">1</button>
-            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">2</button>
-            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">3</button>
-            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">4</button>
-            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">5</button>
-            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">6</button>
-            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">7</button>
-            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">8</button>
-            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">9</button>
-            <div></div>
-            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/20 text-white text-2xl font-light active:bg-white/10 touch-manipulation">0</button>
-            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest active:text-white touch-manipulation">Canc</button>
+            <button onclick="enterPin('1')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">1</button>
+            <button onclick="enterPin('2')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">2</button>
+            <button onclick="enterPin('3')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">3</button>
+            <button onclick="enterPin('4')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">4</button>
+            <button onclick="enterPin('5')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">5</button>
+            <button onclick="enterPin('6')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">6</button>
+            <button onclick="enterPin('7')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">7</button>
+            <button onclick="enterPin('8')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">8</button>
+            <button onclick="enterPin('9')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">9</button>
+            <div class="w-16 h-16"></div>
+            <button onclick="enterPin('0')" class="w-16 h-16 rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">0</button>
+            <button onclick="clearPin()" class="text-white/50 text-[10px] uppercase font-bold touch-manipulation">Canc</button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-gray-100 flex justify-center items-center h-[80px] z-[60] pb-safe gap-16">
-        <button id="nav-foto" onclick="openFotoTab()" class="text-wedding-dark flex flex-col items-center w-16 opacity-100 touch-manipulation transition-opacity">
-            <i data-lucide="layout-grid" class="w-6 h-6 mb-1"></i>
-            <span class="text-[10px] uppercase tracking-wider font-bold">Foto</span>
-        </button>
-
-        <button onclick="triggerUpload()" class="bg-wedding-dark text-white w-14 h-14 rounded-full flex items-center justify-center shadow-2xl -mt-10 border-4 border-wedding-bg active:scale-95 transition-transform touch-manipulation">
-            <i data-lucide="plus" class="w-7 h-7"></i>
-        </button>
-
-        <button id="nav-audio" onclick="openAudioTab()" class="text-wedding-dark flex flex-col items-center w-16 opacity-40 hover:opacity-100 touch-manipulation transition-opacity">
-            <i data-lucide="mic" class="w-6 h-6 mb-1"></i>
-            <span class="text-[10px] uppercase tracking-wider font-bold">Audio</span>
-        </button>
-    </nav>
-
-    <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFileSelection(event)">
+    <input type="file" id="file-input" accept="image/*" multiple hidden onchange="handleFileSelection(event)">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
@@ -257,16 +202,18 @@
         let currentLightboxIndex = 0;
         let globalGuestName = ""; 
         let currentLikesMap = {}; 
-        
+        let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let enteredPin = ""; const PIN_CODE = "2026";
+
         lucide.createIcons();
 
-        // 0. GESTIONE SESSIONE E NOME
+        // SESSIONE
         window.onload = () => {
             const savedSession = sessionStorage.getItem('wedding_session_name');
             if(savedSession) {
                 globalGuestName = savedSession;
                 document.getElementById('privacy-screen').style.display = 'none';
-                document.getElementById('main-app').classList.replace('hidden', 'flex');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('flex');
             }
         };
 
@@ -274,19 +221,18 @@
             const btn = document.getElementById('btn-enter');
             btn.disabled = !document.getElementById('privacy-check').checked;
             btn.classList.toggle('opacity-50', btn.disabled);
-            btn.classList.toggle('cursor-not-allowed', btn.disabled);
         };
 
         window.enterApp = () => {
             let inputName = document.getElementById('guest-name').value.trim();
             const randomCode = Math.floor(1000 + Math.random() * 9000);
             globalGuestName = inputName ? inputName : `Fantasma 👻 #${randomCode}`; 
-            
             sessionStorage.setItem('wedding_session_name', globalGuestName);
             document.getElementById('privacy-screen').classList.add('fade-out-up');
             setTimeout(() => {
                 document.getElementById('privacy-screen').style.display = 'none';
-                document.getElementById('main-app').classList.replace('hidden', 'flex');
+                document.getElementById('main-app').classList.remove('hidden');
+                document.getElementById('main-app').classList.add('flex');
             }, 600);
         };
 
@@ -303,485 +249,160 @@
                 globalGuestName = newName;
                 sessionStorage.setItem('wedding_session_name', globalGuestName);
                 window.closeSettings();
-                confetti({ particleCount: 40, spread: 50, origin: { y: 0.8 }, colors: ['#B89470'] });
+                confetti({ particleCount: 40, colors: ['#B89470'] });
             }
         };
 
         window.forceVisualRefresh = (e) => {
-            if(e) {
-                const icon = e.currentTarget.querySelector('i');
-                if(icon) {
-                    icon.classList.add('animate-spin');
-                    setTimeout(() => icon.classList.remove('animate-spin'), 1000);
-                }
-            }
+            const icon = e.currentTarget.querySelector('i');
+            icon.classList.add('animate-spin');
+            setTimeout(() => icon.classList.remove('animate-spin'), 1000);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // 2. NAVIGAZIONE TAB (FOTO / AUDIO)
-        window.openFotoTab = () => {
-            document.getElementById('audio-app').classList.replace('flex', 'hidden');
-            document.getElementById('main-app').classList.replace('hidden', 'flex');
-            document.getElementById('nav-foto').classList.replace('opacity-40', 'opacity-100');
-            document.getElementById('nav-audio').classList.replace('opacity-100', 'opacity-40');
-            if(mediaRecorder && mediaRecorder.state === 'recording') window.toggleRecording();
-        };
-
-        window.openAudioTab = () => {
-            document.getElementById('main-app').classList.replace('flex', 'hidden');
-            document.getElementById('audio-app').classList.replace('hidden', 'flex');
-            document.getElementById('nav-audio').classList.replace('opacity-40', 'opacity-100');
-            document.getElementById('nav-foto').classList.replace('opacity-100', 'opacity-40');
-            document.getElementById('audio-comment-container').classList.add('hidden');
-            document.getElementById('audio-comment').value = '';
-            document.getElementById('send-audio-btn').classList.add('hidden');
-        };
-
-        window.closePreview = () => { document.getElementById('preview-modal').classList.remove('open'); selectedFilesArray = []; };
-
-        // 3. SISTEMA DEI LIKE E MODALE
+        // LIKE
         window.toggleLike = async (docId, event) => {
             if(event) event.stopPropagation(); 
             const docRef = doc(db, "live_gallery", docId);
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
-            try {
-                if (localLikes.includes(docId)) {
-                    localStorage.setItem('wedding_likes', JSON.stringify(localLikes.filter(id => id !== docId)));
-                    await updateDoc(docRef, { likes: arrayRemove(globalGuestName) });
-                } else {
-                    localLikes.push(docId);
-                    localStorage.setItem('wedding_likes', JSON.stringify(localLikes));
-                    await updateDoc(docRef, { likes: arrayUnion(globalGuestName) });
-                }
-            } catch (e) { console.log("Errore aggiornamento like", e); }
+            if (localLikes.includes(docId)) {
+                localStorage.setItem('wedding_likes', JSON.stringify(localLikes.filter(id => id !== docId)));
+                await updateDoc(docRef, { likes: arrayRemove(globalGuestName) });
+            } else {
+                localLikes.push(docId);
+                localStorage.setItem('wedding_likes', JSON.stringify(localLikes));
+                await updateDoc(docRef, { likes: arrayUnion(globalGuestName) });
+            }
         };
 
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
             const likesArr = currentLikesMap[docId] || [];
             const listEl = document.getElementById('likes-list');
-            listEl.innerHTML = '';
-            if(likesArr.length === 0) {
-                listEl.innerHTML = '<p class="text-gray-400 text-sm text-center font-serif italic mt-4">Nessun like ancora.</p>';
-            } else {
-                [...likesArr].reverse().forEach(liker => {
-                    const displayName = liker.startsWith("Fantasma") ? "Un Fantasma 👻" : liker;
-                    listEl.insertAdjacentHTML('beforeend', `
-                        <div class="flex items-center gap-4 bg-wedding-bg p-4 rounded-2xl border border-orange-50">
-                            <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-wedding-gold shadow-sm shrink-0">
-                                <i data-lucide="user" class="w-5 h-5"></i>
-                            </div>
-                            <span class="text-sm font-semibold text-wedding-dark">${displayName}</span>
-                        </div>
-                    `);
-                });
-            }
+            listEl.innerHTML = likesArr.length === 0 ? '<p class="text-gray-400 text-sm text-center italic mt-4">Nessun like ancora.</p>' : '';
+            [...likesArr].reverse().forEach(liker => {
+                const displayName = liker.startsWith("Fantasma") ? "Un Fantasma 👻" : liker;
+                listEl.insertAdjacentHTML('beforeend', `<div class="flex items-center gap-4 bg-wedding-bg p-4 rounded-2xl border border-orange-50"><div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-wedding-gold shadow-sm shrink-0"><i data-lucide="user" class="w-5 h-5"></i></div><span class="text-sm font-bold text-wedding-dark">${displayName}</span></div>`);
+            });
             lucide.createIcons();
-            const overlay = document.getElementById('likes-modal-overlay');
-            const modal = document.getElementById('likes-modal');
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
-            modal.classList.add('open');
+            document.getElementById('likes-modal-overlay').classList.remove('hidden');
+            setTimeout(() => document.getElementById('likes-modal-overlay').classList.remove('opacity-0'), 10);
+            document.getElementById('likes-modal').classList.add('open');
         };
 
         window.closeLikesModal = () => {
-            const overlay = document.getElementById('likes-modal-overlay');
-            const modal = document.getElementById('likes-modal');
-            overlay.classList.add('opacity-0');
-            modal.classList.remove('open');
-            setTimeout(() => overlay.classList.add('hidden'), 300);
+            document.getElementById('likes-modal-overlay').classList.add('opacity-0');
+            document.getElementById('likes-modal').classList.remove('open');
+            setTimeout(() => document.getElementById('likes-modal-overlay').classList.add('hidden'), 300);
         };
 
-        document.getElementById('likes-modal-overlay').addEventListener('click', window.closeLikesModal);
-        let likesTouchStartY = 0;
-        document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
-        document.getElementById('likes-modal').addEventListener('touchend', e => {
-            if (e.changedTouches[0].screenY > likesTouchStartY + 60) window.closeLikesModal(); 
-        }, {passive: true});
-
-        // 4. UPLOAD FOTO
+        // UPLOAD
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         window.handleFileSelection = (event) => {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
-            selectedFilesArray = files.map(f => ({ file: f, flipped: false, comment: '' }));
-            window.renderPreviewGrid();
-            document.getElementById('preview-modal').classList.add('open');
-            event.target.value = '';
-        };
-
-        window.updateSingleComment = (index, val) => { selectedFilesArray[index].comment = val; };
-
-        window.renderPreviewGrid = () => {
+            selectedFilesArray = files.map(f => ({ file: f, comment: '' }));
             const grid = document.getElementById('preview-grid');
             grid.innerHTML = '';
             selectedFilesArray.forEach((item, index) => {
-                const url = URL.createObjectURL(item.file);
-                const flipClass = item.flipped ? '-scale-x-100' : '';
-                grid.insertAdjacentHTML('beforeend', `
-                    <div class="flex flex-col gap-1 bg-white rounded-lg border border-gray-100 p-2 shadow-sm">
-                        <div class="relative aspect-square rounded-md overflow-hidden bg-gray-100">
-                            <img src="${url}" class="w-full h-full object-cover ${flipClass}">
-                            <button onclick="window.removeFile(${index})" class="absolute top-1 right-1 bg-white/80 p-1.5 rounded-full text-red-500 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                        </div>
-                        <div class="flex items-center gap-1 mt-1">
-                            <input type="text" oninput="window.updateSingleComment(${index}, this.value)" value="${item.comment}" placeholder="Dedica..." class="w-full bg-gray-50 border border-gray-200 text-[10px] p-2 rounded focus:outline-none focus:border-wedding-gold transition-colors">
-                            <button onclick="window.toggleFlip(${index})" class="shrink-0 p-2 text-gray-500 border border-gray-200 rounded bg-gray-50 hover:bg-gray-100 transition-colors">
-                                <i data-lucide="flip-horizontal" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                `);
+                grid.insertAdjacentHTML('beforeend', `<div class="bg-white rounded-3xl p-3 shadow-sm border border-orange-50"><div class="relative aspect-square rounded-2xl overflow-hidden mb-2 bg-gray-100"><img src="${URL.createObjectURL(item.file)}" class="w-full h-full object-cover"></div><input type="text" oninput="window.updateSingleComment(${index}, this.value)" placeholder="Dedica..." class="w-full bg-wedding-bg text-xs p-3 rounded-xl focus:outline-none focus:border-wedding-brown font-medium"></div>`);
             });
             lucide.createIcons();
+            document.getElementById('preview-modal').classList.add('open');
+            event.target.value = '';
         };
-
-        window.toggleFlip = (index) => { selectedFilesArray[index].flipped = !selectedFilesArray[index].flipped; window.renderPreviewGrid(); };
-        window.removeFile = (index) => { selectedFilesArray.splice(index, 1); if (selectedFilesArray.length === 0) window.closePreview(); else window.renderPreviewGrid(); };
-
-        const getFlippedFile = (file) => {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = img.width; canvas.height = img.height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((blob) => resolve(new File([blob], file.name, { type: file.type })), file.type);
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        };
+        window.updateSingleComment = (index, val) => { selectedFilesArray[index].comment = val; };
+        window.closePreview = () => { document.getElementById('preview-modal').classList.remove('open'); };
 
         window.startUpload = async () => {
-            if (selectedFilesArray.length === 0) return;
             const btn = document.getElementById('upload-btn');
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Invio...';
-            btn.disabled = true;
-
-            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
-
-            for (let i = 0; i < selectedFilesArray.length; i++) {
-                let item = selectedFilesArray[i];
+            btn.innerHTML = 'Caricamento...'; btn.disabled = true;
+            const finalName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
+            for (let item of selectedFilesArray) {
                 try {
-                    let fileToUpload = item.flipped ? await getFlippedFile(item.file) : item.file;
                     const formData = new FormData();
-                    formData.append("file", fileToUpload);
+                    formData.append("file", item.file);
                     formData.append("upload_preset", UPLOAD_PRESET);
-                    
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                     const data = await res.json();
-                    
-                    await addDoc(galleryRef, { 
-                        url: data.secure_url, 
-                        type: 'image', 
-                        comment: item.comment, 
-                        guestName: finalGuestName, 
-                        likes: [],
-                        timestamp: serverTimestamp() 
-                    });
-                } catch (err) { console.error(err); }
+                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: item.comment, guestName: finalName, likes: [], timestamp: serverTimestamp() });
+                } catch (e) {}
             }
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#1A1A1A', '#D4AF37', '#FAFAFA'] });
-            btn.innerHTML = '<i data-lucide="send" class="w-4 h-4"></i> Condividi';
-            btn.disabled = false;
+            confetti({ particleCount: 100, colors: ['#B89470', '#5D6D5E'] });
+            btn.innerHTML = 'Invia alla Gallery'; btn.disabled = false;
             window.closePreview();
         };
 
-        // 5. AUDIO GUESTBOOK
-        let mediaRecorder; let audioChunks = []; let recordingInterval; let seconds = 0;
-
-        window.toggleRecording = async () => {
-            const btn = document.getElementById('mic-btn');
-            const icon = document.getElementById('mic-icon');
-            const timerDisplay = document.getElementById('audio-timer');
-            const sendBtn = document.getElementById('send-audio-btn');
-            const commentBox = document.getElementById('audio-comment-container');
-
-            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    mediaRecorder = new MediaRecorder(stream);
-                    audioChunks = [];
-                    sendBtn.classList.add('hidden');
-                    commentBox.classList.add('hidden');
-
-                    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
-                    mediaRecorder.onstop = () => {
-                        sendBtn.classList.replace('hidden', 'block');
-                        commentBox.classList.replace('hidden', 'block');
-                        sendBtn.disabled = false;
-                        sendBtn.innerHTML = 'Invia Messaggio';
-                    };
-
-                    mediaRecorder.start();
-                    btn.classList.add('recording-pulse', 'border-red-500', 'text-red-500');
-                    icon.setAttribute('data-lucide', 'square'); lucide.createIcons();
-                    
-                    seconds = 0;
-                    recordingInterval = setInterval(() => {
-                        seconds++;
-                        let m = Math.floor(seconds / 60).toString().padStart(2, '0');
-                        let s = (seconds % 60).toString().padStart(2, '0');
-                        timerDisplay.innerText = `${m}:${s}`;
-                        if (seconds >= 90) window.toggleRecording(); 
-                    }, 1000);
-                } catch (err) { alert("Consenti l'accesso al microfono."); }
-            } else {
-                mediaRecorder.stop();
-                clearInterval(recordingInterval);
-                btn.classList.remove('recording-pulse', 'border-red-500', 'text-red-500');
-                icon.setAttribute('data-lucide', 'mic'); lucide.createIcons();
-                mediaRecorder.stream.getTracks().forEach(track => track.stop()); 
-            }
-        };
-
-        window.processAndUploadAudio = async () => {
-            const btn = document.getElementById('send-audio-btn');
-            const commentBox = document.getElementById('audio-comment-container');
-            const comment = document.getElementById('audio-comment').value.trim();
-
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin inline-block"></i> Salvataggio...';
-            btn.disabled = true;
-
-            const finalGuestName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
-
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const formData = new FormData();
-            formData.append("file", audioBlob, "guestbook_audio.webm");
-            formData.append("upload_preset", UPLOAD_PRESET);
-
-            try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`, { method: "POST", body: formData });
-                const data = await res.json();
-                
-                await addDoc(galleryRef, { 
-                    url: data.secure_url, 
-                    type: 'audio', 
-                    comment: comment, 
-                    guestName: finalGuestName, 
-                    likes: [],
-                    timestamp: serverTimestamp() 
-                });
-
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#1A1A1A'] });
-                document.getElementById('audio-timer').innerText = "00:00";
-                document.getElementById('audio-comment').value = '';
-                commentBox.classList.add('hidden');
-            } catch (err) { alert("Errore durante l'invio dell'audio."); } 
-            finally { btn.classList.add('hidden'); }
-        };
-
-        // 6. LIGHTBOX CON NOME E LIKE
+        // LIGHTBOX
         window.openLightbox = (index) => {
             currentLightboxIndex = index;
             window.updateLightboxUI();
             document.getElementById('lightbox-modal').classList.remove('hidden');
             document.getElementById('lightbox-modal').classList.add('flex');
-            document.body.style.overflow = 'hidden'; 
         };
-        window.closeLightbox = () => {
-            document.getElementById('lightbox-modal').classList.remove('flex');
-            document.getElementById('lightbox-modal').classList.add('hidden');
-            document.body.style.overflow = ''; 
-        };
+        window.closeLightbox = () => { document.getElementById('lightbox-modal').classList.replace('flex', 'hidden'); };
         window.updateLightboxUI = () => {
-            if (globalGalleryData.length === 0) return;
             const item = globalGalleryData[currentLightboxIndex];
-            const highResUrl = item.url.replace("/upload/", "/upload/w_1200,c_limit,q_auto/");
-            document.getElementById('lightbox-img').src = highResUrl;
-            
-            const commentContainer = document.getElementById('lightbox-comment-container');
-            const commentText = document.getElementById('lightbox-comment');
-            
+            document.getElementById('lightbox-img').src = item.url.replace("/upload/", "/upload/w_1200,q_auto/");
             const cleanAuthor = item.guestName ? (item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName) : "Un Fantasma 👻";
-            let authorStr = `<span class="font-bold text-wedding-gold">by ${cleanAuthor}</span>`;
-            let commentStr = item.comment ? `<br>"${item.comment}"` : '';
-            
-            commentText.innerHTML = `${authorStr}${commentStr}`;
-            commentContainer.classList.remove('hidden');
-
+            document.getElementById('lightbox-comment').innerHTML = `<span class="font-bold text-wedding-gold">by ${cleanAuthor}</span>${item.comment ? `<br>"${item.comment}"` : ''}`;
             const likesCount = item.likes ? item.likes.length : 0;
-            const lightboxLikesBtn = document.getElementById('lightbox-likes-btn');
-            
-            if(likesCount > 0) {
-                lightboxLikesBtn.innerHTML = `Visualizza ${likesCount} mi piace`;
-                lightboxLikesBtn.onclick = (e) => window.openLikesModal(item.docId, e);
-                lightboxLikesBtn.classList.remove('hidden');
-            } else {
-                lightboxLikesBtn.classList.add('hidden');
-            }
+            const btn = document.getElementById('lightbox-likes-btn');
+            if(likesCount > 0) { btn.innerHTML = `Visualizza ${likesCount} mi piace`; btn.onclick = (e) => window.openLikesModal(item.docId, e); btn.classList.remove('hidden'); }
+            else { btn.classList.add('hidden'); }
         };
-        window.prevLightbox = (e) => {
-            if(e) e.stopPropagation();
-            currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length;
-            window.updateLightboxUI();
-        };
-        window.nextLightbox = (e) => {
-            if(e) e.stopPropagation();
-            currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length;
-            window.updateLightboxUI();
-        };
+        window.prevLightbox = (e) => { e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length; window.updateLightboxUI(); };
+        window.nextLightbox = (e) => { e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length; window.updateLightboxUI(); };
 
-        let touchStartX = 0;
-        document.getElementById('lightbox-modal').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-        document.getElementById('lightbox-modal').addEventListener('touchend', e => {
-            if (e.changedTouches[0].screenX < touchStartX - 50) window.nextLightbox();
-            if (e.changedTouches[0].screenX > touchStartX + 50) window.prevLightbox();
-        }, {passive: true});
-
-        // 7. RENDER REALTIME SMART DOM 
-        const q = query(galleryRef, orderBy("timestamp", "desc"));
-        onSnapshot(q, (snapshot) => {
+        // REALTIME
+        onSnapshot(query(galleryRef, orderBy("timestamp", "desc")), (snapshot) => {
             const gallery = document.getElementById("gallery-grid");
-            const audioFeed = document.getElementById("audio-feed-grid");
-            
-            if (!snapshot.empty) {
-                const es1 = document.getElementById("empty-state");
-                if (es1) es1.remove();
-                const es2 = document.getElementById("empty-audio-state");
-                if (es2) es2.remove();
-            }
-            
+            if (!snapshot.empty) { const es = document.getElementById("empty-state"); if (es) es.remove(); }
             globalGalleryData = []; 
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
-
             const currentDocIds = snapshot.docs.map(doc => "card-" + doc.id);
             Array.from(gallery.children).forEach(child => { if (child.id && child.id.startsWith('card-') && !currentDocIds.includes(child.id)) child.remove(); });
-            Array.from(audioFeed.children).forEach(child => { if (child.id && child.id.startsWith('card-') && !currentDocIds.includes(child.id)) child.remove(); });
 
-            let imageIndex = 0; let audioIndex = 0;
-
+            let imageIndex = 0;
             snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
+                if (data.type !== 'image') return;
                 const docId = docSnap.id;
-                
                 currentLikesMap[docId] = data.likes || [];
                 const likesCount = currentLikesMap[docId].length;
                 const isLiked = localLikes.includes(docId);
-                const heartClass = isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400';
-                
-                const cleanAuthorRaw = data.guestName ? data.guestName : 'Fantasma 👻';
-                const cleanAuthor = cleanAuthorRaw.startsWith("Fantasma") ? "Un Fantasma 👻" : cleanAuthorRaw;
+                const pIndex = globalGalleryData.length;
+                globalGalleryData.push({ ...data, docId });
 
-                if (data.type === 'audio') {
-                    const audioCommentHtml = data.comment ? `<p class="text-[10px] text-gray-500 italic mb-2">"${data.comment}"</p>` : '';
-                    
-                    const likesText = likesCount > 0 ? `<span class="text-[10px] text-wedding-dark font-semibold ml-auto cursor-pointer" onclick="window.openLikesModal('${docId}', event)">${likesCount} mi piace</span>` : `<span class="text-[10px] text-gray-400 font-medium ml-auto">0 mi piace</span>`;
-
-                    let card = document.getElementById(`card-${docId}`);
-                    if (!card) {
-                        card = document.createElement('div');
-                        card.id = `card-${docId}`;
-                        card.className = "bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex flex-col";
-                        card.innerHTML = `
-                            <div class="flex items-center gap-3">
-                                <div class="bg-wedding-accent rounded-full p-3 text-wedding-gold shrink-0"><i data-lucide="mic" class="w-5 h-5"></i></div>
-                                <div class="flex-grow min-w-0">
-                                    <p class="text-xs font-semibold text-wedding-dark mb-1">by <span class="text-wedding-gold">${cleanAuthor}</span></p>
-                                    ${audioCommentHtml}
-                                    <audio controls controlsList="nodownload" src="${data.url}" class="w-full h-8 scale-[0.85] origin-left"></audio>
-                                </div>
-                            </div>
-                            <div class="flex items-center mt-3 pt-3 border-t border-gray-50">
-                                <button onclick="window.toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform" id="btn-like-${docId}"><i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i></button>
-                                <div id="text-like-${docId}" class="ml-auto flex items-center">${likesText}</div>
-                            </div>
-                        `;
-                    } else {
-                        document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-5 h-5 ${heartClass}"></i>`;
-                        document.getElementById(`text-like-${docId}`).innerHTML = likesText;
-                    }
-                    if (audioFeed.children[audioIndex] !== card) audioFeed.insertBefore(card, audioFeed.children[audioIndex]);
-                    audioIndex++;
+                const cleanAuthor = data.guestName ? (data.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : data.guestName) : "Un Fantasma 👻";
+                let card = document.getElementById(`card-${docId}`);
+                if (!card) {
+                    card = document.createElement('div');
+                    card.id = `card-${docId}`;
+                    card.className = "bg-white rounded-[32px] overflow-hidden shadow-sm border border-orange-50 flex flex-col p-2 photo-reveal";
+                    card.innerHTML = `<div class="aspect-square rounded-[24px] overflow-hidden cursor-pointer relative" onclick="window.openLightbox(${pIndex})" id="img-container-${docId}"><img src="${data.url.replace('/upload/', '/upload/w_300,c_fill,q_auto:eco/')}" class="w-full h-full object-cover no-save"><div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80 pointer-events-none"></div><p class="absolute bottom-2 left-3 text-white text-[9px] font-bold z-10 truncate w-4/5">by ${cleanAuthor}</p></div><div class="p-2 flex items-center justify-between"><button onclick="window.toggleLike('${docId}', event)" id="btn-like-${docId}" class="p-2"><i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-300'}"></i></button><span id="text-like-${docId}" class="text-[10px] font-bold text-wedding-dark pr-2">${likesCount > 0 ? `${likesCount} mi piace` : '0 mi piace'}</span></div>`;
                 } else {
-                    const pIndex = globalGalleryData.length;
-                    globalGalleryData.push({ url: data.url, comment: data.comment, guestName: data.guestName, docId: docId, likes: currentLikesMap[docId] });
-                    
-                    const optimizedUrl = data.url.replace("/upload/", "/upload/w_400,h_400,c_fill,g_auto,q_auto,f_auto/");
-                    const likesText = likesCount > 0 ? `<span class="text-[10px] text-wedding-dark font-semibold">${likesCount} mi piace</span>` : `<span class="text-[10px] text-gray-400 font-medium">0 mi piace</span>`;
-
-                    let card = document.getElementById(`card-${docId}`);
-                    if (!card) {
-                        card = document.createElement('div');
-                        card.id = `card-${docId}`;
-                        card.className = "bg-white border border-gray-100 rounded-lg shadow-sm flex flex-col overflow-hidden relative";
-                        card.setAttribute("oncontextmenu", "return false;");
-                        card.innerHTML = `
-                            <div class="aspect-square relative overflow-hidden cursor-pointer" onclick="window.openLightbox(${pIndex})" id="img-container-${docId}">
-                                <img src="${optimizedUrl}" class="w-full h-full object-cover no-save" draggable="false">
-                                <div class="absolute inset-0 z-0 no-save"></div>
-                            </div>
-                            <div class="p-1.5 flex items-center justify-between bg-white h-9 border-t border-gray-50">
-                                <div class="flex items-center gap-1.5 w-full">
-                                    <button onclick="window.toggleLike('${docId}', event)" class="p-1 active:scale-90 transition-transform shrink-0" id="btn-like-${docId}">
-                                        <i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>
-                                    </button>
-                                    <div class="flex-grow min-w-0 pr-1 flex items-center" id="text-like-${docId}">
-                                        ${likesText}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-4 h-4 ${heartClass}"></i>`;
-                        document.getElementById(`text-like-${docId}`).innerHTML = likesText;
-                        document.getElementById(`img-container-${docId}`).setAttribute("onclick", `window.openLightbox(${pIndex})`);
-                        if(document.getElementById('lightbox-modal').classList.contains('flex') && currentLightboxIndex === pIndex) window.updateLightboxUI();
-                    }
-                    if (gallery.children[imageIndex] !== card) gallery.insertBefore(card, gallery.children[imageIndex]);
-                    imageIndex++;
+                    document.getElementById(`btn-like-${docId}`).innerHTML = `<i data-lucide="heart" class="w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-300'}"></i>`;
+                    document.getElementById(`text-like-${docId}`).innerText = likesCount > 0 ? `${likesCount} mi piace` : '0 mi piace';
+                    document.getElementById(`img-container-${docId}`).setAttribute("onclick", `window.openLightbox(${pIndex})`);
                 }
+                if (gallery.children[imageIndex] !== card) gallery.insertBefore(card, gallery.children[imageIndex]);
+                imageIndex++;
             });
-
-            if (imageIndex === 0) {
-                gallery.innerHTML = `
-                    <div id="empty-state" class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm">
-                        <i data-lucide="sparkles" class="w-8 h-8 text-wedding-gold mb-3 opacity-80"></i>
-                        <p class="font-serif text-lg text-wedding-dark italic leading-relaxed">Rompi il ghiaccio!<br><span class="text-sm text-gray-500 font-sans">Sii il primo a scattare una foto.</span></p>
-                    </div>
-                `;
-            }
-            if (audioIndex === 0) {
-                audioFeed.innerHTML = `
-                    <div id="empty-audio-state" class="bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl p-5 shadow-sm flex flex-col items-center text-center">
-                        <div class="bg-white rounded-full p-3 shadow-sm mb-3"><i data-lucide="mic" class="w-6 h-6 text-wedding-gold"></i></div>
-                        <p class="font-serif text-sm text-wedding-dark italic">"Il microfono è acceso.<br>Lascia un messaggio!"</p>
-                    </div>
-                `;
-            }
+            if (imageIndex === 0) gallery.innerHTML = `<div id="empty-state" class="col-span-2 aspect-video relative bg-gradient-to-br from-wedding-accent to-white border border-wedding-gold/20 rounded-xl flex flex-col items-center justify-center p-6 text-center shadow-sm"><i data-lucide="sparkles" class="w-8 h-8 text-wedding-gold mb-3 opacity-80"></i><p class="font-serif text-lg text-wedding-dark italic">Rompi il ghiaccio!<br><span class="text-sm text-gray-500 font-sans">Sii il primo a scattare una foto.</span></p></div>`;
             lucide.createIcons();
         });
 
-        // 8. HONEYPOT E ADMIN
-        let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let failedAttempts = 0; let enteredPin = ""; const PIN_CODE = "2026";
-        
+        // ADMIN
         window.handleSecretAdmin = (e) => {
-            if(e) e.preventDefault();
             adminTapCount++;
-            
-            const icon = e.currentTarget.querySelector('i');
-            if(icon) {
-                icon.classList.add('scale-150', 'text-wedding-brown');
-                setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150);
-            }
-            
+            const icon = document.getElementById('lock-icon');
+            icon.classList.add('scale-150', 'text-wedding-brown');
+            setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150);
             clearTimeout(adminTapTimer);
-
-            if (adminTapCount >= 10) {
-                isSecretUnlocked = true; adminTapCount = 0;
-                confetti({ particleCount: 20, origin: { y: 0.1 }, colors: ['#D4AF37'] }); 
-                window.openPinModal();
-            } else {
-                adminTapTimer = setTimeout(() => { if (adminTapCount > 0) { isSecretUnlocked = false; adminTapCount = 0; window.openPinModal(); } }, 800); 
-            }
+            if (adminTapCount >= 10) { isSecretUnlocked = true; adminTapCount = 0; confetti({ particleCount: 20, origin: { y: 0.1 }, colors: ['#D4AF37'] }); window.openPinModal(); }
+            else { adminTapTimer = setTimeout(() => { if (adminTapCount > 0) { isSecretUnlocked = false; adminTapCount = 0; window.openPinModal(); } }, 800); }
         };
-
         window.openPinModal = () => { document.getElementById('pin-modal').classList.replace('hidden', 'flex'); enteredPin = ""; window.updatePinDots(); };
         window.closePinModal = () => { document.getElementById('pin-modal').classList.replace('flex', 'hidden'); };
         window.enterPin = (num) => {
@@ -790,22 +411,14 @@
                 if (enteredPin.length === 4) {
                     setTimeout(() => {
                         if (enteredPin === PIN_CODE && isSecretUnlocked) window.location.href = "admin.html";
-                        else {
-                            failedAttempts++;
-                            const dots = document.querySelector('.pin-dot').parentElement;
-                            dots.classList.add('translate-x-2');
-                            setTimeout(() => dots.classList.remove('translate-x-2'), 100);
-                            setTimeout(() => dots.classList.add('-translate-x-2'), 200);
-                            setTimeout(() => dots.classList.remove('-translate-x-2'), 300);
-                            if (failedAttempts >= 3) setTimeout(() => window.location.reload(), 500); 
-                            else { enteredPin = ""; window.updatePinDots(); }
-                        }
+                        else { enteredPin = ""; window.updatePinDots(); }
                     }, 300);
                 }
             }
         };
         window.updatePinDots = () => { document.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('bg-wedding-gold', i < enteredPin.length)); };
         window.clearPin = () => { enteredPin = ""; window.updatePinDots(); };
+        window.closeModals = () => {};
     </script>
 </body>
 </html>
