@@ -50,20 +50,27 @@
     <!-- ========================================== -->
     <!-- 1. PRIVACY SCREEN -->
     <!-- ========================================== -->
-    <div id="privacy-screen" class="fixed inset-0 z-[100] bg-wedding-bg flex flex-col items-center justify-center p-8 text-center">
-        <div class="max-w-sm w-full">
-            <div class="w-20 h-20 bg-wedding-gold/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-wedding-gold/30 text-wedding-gold font-serif text-2xl shadow-inner">M&M</div>
-            <h1 class="font-serif text-[28px] leading-tight mb-2 text-wedding-dark">Benvenuti al nostro<br>Matrimonio</h1>
-            <p class="text-xs uppercase tracking-widest text-wedding-brown mb-10 font-bold">09 Maggio 2026</p>
+    <!-- Modificato justify-center in justify-end e aggiunto pb-16 per abbassare il box -->
+    <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-end p-8 pb-16 text-center overflow-hidden">
+        <!-- Sfondo a tutto schermo con overlay sfumato -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://res.cloudinary.com/dvjgznbzm/image/upload/v1776095870/5a760781-b72b-40e1-bd75-85816fbd659a_zbmpht.jpg" class="w-full h-full object-cover object-center" alt="Sfondo Sposi">
+            <!-- Aggiunto gradiente per lasciare nitidi i visi in alto e scurire il fondo -->
+            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px]"></div>
+        </div>
+
+        <div class="max-w-sm w-full relative z-10">
+            <h1 class="font-serif text-[32px] leading-tight mb-2 text-white drop-shadow-lg">Benvenuti al nostro<br>Matrimonio</h1>
+            <p class="text-xs uppercase tracking-widest text-white/90 mb-8 font-bold drop-shadow-md">09 Maggio 2026</p>
             
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-orange-50 mb-8 text-left">
-                <input type="text" id="guest-name" placeholder="Inserisci il tuo nome (Opzionale)" class="w-full bg-wedding-bg border border-gray-100 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center placeholder:font-normal placeholder:text-gray-400">
+            <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white/20 mb-6 text-left">
+                <input type="text" id="guest-name" placeholder="Inserisci il tuo nome (Opzionale)" class="w-full bg-gray-50 border border-gray-200 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center placeholder:font-normal placeholder:text-gray-400 shadow-inner">
                 <label class="flex items-start gap-3 cursor-pointer">
-                    <input type="checkbox" id="privacy-check" onchange="toggleEnterBtn()" class="mt-1 w-5 h-5 rounded border-gray-300 text-wedding-brown focus:ring-wedding-brown custom-checkbox transition-colors shrink-0">
-                    <span class="text-[11px] text-gray-500 leading-tight font-medium">Accetto di condividere i miei momenti con gli sposi e gli invitati nella galleria live.</span>
+                    <input type="checkbox" id="privacy-check" onchange="toggleEnterBtn()" class="mt-1 w-5 h-5 rounded border-gray-300 text-wedding-brown focus:ring-wedding-brown custom-checkbox transition-colors shrink-0 shadow-sm">
+                    <span class="text-[11px] text-gray-600 leading-tight font-medium mt-0.5">Accetto di condividere i miei momenti con gli sposi e gli invitati nella galleria live.</span>
                 </label>
             </div>
-            <button id="btn-enter" disabled onclick="enterApp()" class="w-full bg-wedding-sage text-white font-bold uppercase tracking-widest text-xs py-5 rounded-2xl opacity-50 cursor-not-allowed transition-all shadow-lg">Entra nell'App</button>
+            <button id="btn-enter" disabled onclick="enterApp()" class="w-full bg-wedding-sage text-white font-bold uppercase tracking-widest text-xs py-5 rounded-2xl opacity-50 cursor-not-allowed transition-all shadow-xl">Entra nell'App</button>
         </div>
     </div>
 
@@ -178,15 +185,26 @@
     <!-- ========================================== -->
 
     <!-- LIGHTBOX FOTO E LIKE -->
-    <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-black/95 hidden flex-col items-center justify-center touch-none">
-        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 p-2 z-50 hover:text-white"><i data-lucide="x" class="w-8 h-8"></i></button>
-        <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50"><i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i></button>
-        <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 p-4 z-50"><i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i></button>
+    <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-wedding-bg hidden flex-col items-center justify-center touch-none">
+        
+        <!-- Top Bar a tema -->
+        <div class="absolute top-0 inset-x-0 h-16 bg-wedding-bg/95 backdrop-blur-md border-b border-orange-50 flex items-center justify-between px-4 z-50 shadow-sm">
+            <button onclick="closeLightbox()" class="text-wedding-dark flex items-center gap-2 p-2 active:scale-95 transition-transform">
+                <i data-lucide="x" class="w-6 h-6"></i>
+                <span class="text-[10px] uppercase tracking-widest font-bold">Chiudi</span>
+            </button>
+            <!-- Contenitore Cestino (Visibile solo al proprietario) -->
+            <div id="lightbox-delete-container"></div>
+        </div>
 
-        <img id="lightbox-img" src="" class="max-w-full max-h-[65vh] object-contain no-save mb-[140px]" draggable="false">
+        <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-wedding-dark/30 hover:text-wedding-dark p-4 z-50"><i data-lucide="chevron-left" class="w-10 h-10 drop-shadow-lg"></i></button>
+        <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-wedding-dark/30 hover:text-wedding-dark p-4 z-50"><i data-lucide="chevron-right" class="w-10 h-10 drop-shadow-lg"></i></button>
+
+        <!-- Immagine con gestore doppio tap -->
+        <img id="lightbox-img" src="" class="max-w-full max-h-[60vh] object-contain no-save mb-[140px] mt-16 rounded-xl shadow-sm" draggable="false" onclick="window.handleLightboxDoubleClick(event)">
         
         <!-- Barra Bianca Inferiore della Lightbox -->
-        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.3)] p-6 flex flex-col items-center min-h-[140px] justify-center z-50">
+        <div class="absolute bottom-0 inset-x-0 bg-white rounded-t-[40px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-orange-50 p-6 flex flex-col items-center min-h-[140px] justify-center z-50">
             <div class="w-full flex justify-between items-start mb-4">
                 <div class="flex-grow pr-4">
                     <p id="lightbox-author" class="font-bold text-wedding-dark text-sm"></p>
@@ -228,7 +246,7 @@
         </div>
     </div>
 
-    <!-- MODAL TASTIERINO PIN ADMIN (RIPRISTINATO) -->
+    <!-- MODAL TASTIERINO PIN ADMIN -->
     <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <div class="w-16 h-16 bg-wedding-gold/20 rounded-full flex items-center justify-center mb-4 border border-wedding-gold/30">
@@ -265,7 +283,7 @@
     <!-- JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyAKSDOdxKmz_NmqhuijaNGZXdjLBXnHCU1E",
@@ -288,7 +306,34 @@
         let currentLikesMap = {}; 
         let adminTapCount = 0; let adminTapTimer = null; let isSecretUnlocked = false; let enteredPin = ""; const PIN_CODE = "2026";
 
+        // Generazione o recupero Device ID (serve per eliminare le proprie foto)
+        let deviceId = localStorage.getItem('wedding_device_id');
+        if (!deviceId) {
+            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+            localStorage.setItem('wedding_device_id', deviceId);
+        }
+
         lucide.createIcons();
+
+        // --- ANIMAZIONE CUORE FLUTTUANTE (Doppio tap) ---
+        window.showFloatingHeart = (x, y) => {
+            const heart = document.createElement('div');
+            heart.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
+            heart.className = 'fixed z-[9999] pointer-events-none transform -translate-x-1/2 -translate-y-1/2 scale-50 opacity-0 transition-all duration-300 ease-out drop-shadow-xl';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            document.body.appendChild(heart);
+
+            requestAnimationFrame(() => {
+                heart.classList.remove('scale-50', 'opacity-0');
+                heart.classList.add('scale-110', 'opacity-90');
+                setTimeout(() => {
+                    heart.classList.remove('scale-110', 'opacity-90');
+                    heart.classList.add('scale-150', 'opacity-0');
+                    setTimeout(() => heart.remove(), 300);
+                }, 500);
+            });
+        };
 
         // 1. GESTIONE TAB & MEMORIA
         window.switchTab = (tab) => {
@@ -316,7 +361,7 @@
                 globalGuestName = savedName;
                 document.getElementById('privacy-screen').style.display = 'none';
                 document.getElementById('main-app').classList.replace('hidden', 'flex');
-                window.switchTab(savedTab); // Ripristina il tab salvato
+                window.switchTab(savedTab);
             }
         };
 
@@ -355,7 +400,6 @@
             }
         };
 
-        // REFRESH VISIVO (Senza ricaricare la pagina)
         window.forceVisualRefresh = (e) => {
             if(e) {
                 const icon = e.currentTarget.querySelector('i');
@@ -398,14 +442,14 @@
             });
             lucide.createIcons();
             document.getElementById('selected-files-list').classList.remove('hidden');
-            event.target.value = ''; // Reset input
+            event.target.value = ''; 
         };
 
         window.updateSingleComment = (index, val) => { selectedFilesArray[index].comment = val; };
         window.removeFile = (index) => { 
             selectedFilesArray.splice(index, 1); 
             if(selectedFilesArray.length === 0) document.getElementById('selected-files-list').classList.add('hidden');
-            else window.handleFileSelection({target: {files: selectedFilesArray.map(i=>i.file)}}); // fake re-render
+            else window.handleFileSelection({target: {files: selectedFilesArray.map(i=>i.file)}}); 
         };
 
         window.startUpload = async () => {
@@ -418,6 +462,8 @@
             const text = document.getElementById('progress-percentage');
             overlay.classList.remove('hidden');
 
+            const finalName = globalGuestName.startsWith("Fantasma") ? "" : globalGuestName;
+
             for (let i = 0; i < total; i++) {
                 let item = selectedFilesArray[i];
                 try {
@@ -426,7 +472,8 @@
                     formData.append("upload_preset", UPLOAD_PRESET);
                     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                     const data = await res.json();
-                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: item.comment, guestName: globalGuestName, likes: [], timestamp: serverTimestamp() });
+                    
+                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: item.comment, guestName: finalName, likes: [], deviceId: deviceId, timestamp: serverTimestamp() });
                     
                     let percent = Math.round(((i + 1) / total) * 100);
                     bar.style.width = percent + '%';
@@ -441,22 +488,31 @@
                 document.getElementById('selected-files-list').classList.add('hidden');
                 bar.style.width = '0%'; ring.style.left = '0%'; text.innerText = '0%';
                 selectedFilesArray = [];
-                window.switchTab('galleria'); // Vai in galleria automaticamente dopo l'upload
+                window.switchTab('galleria'); 
             }, 800);
         };
 
+        window.deletePhoto = async (docId) => {
+            if (confirm("Vuoi davvero eliminare questa foto? L'azione è irreversibile.")) {
+                try {
+                    await deleteDoc(doc(db, "live_gallery", docId));
+                    window.closeLightbox();
+                } catch (e) { console.error("Errore eliminazione", e); }
+            }
+        };
+
         // 4. GESTIONE LIKE & DATABASE REALTIME
-        window.toggleLike = async (docId, event) => {
-            if(event) event.stopPropagation(); 
+        window.toggleLike = async (docId, event, isDoubleClick = false) => {
+            if(event && !isDoubleClick) event.stopPropagation(); 
             const docRef = doc(db, "live_gallery", docId);
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             
-            // Animazione immediata pulsante
-            const btn = event ? event.currentTarget : null;
+            const btn = (event && !isDoubleClick) ? event.currentTarget : null;
             if(btn) { btn.classList.add('scale-125'); setTimeout(()=>btn.classList.remove('scale-125'), 200); }
 
             try {
                 if (localLikes.includes(docId)) {
+                    if(isDoubleClick) return; // Un doppio tap non rimuove mai il mi piace
                     localStorage.setItem('wedding_likes', JSON.stringify(localLikes.filter(id => id !== docId)));
                     await updateDoc(docRef, { likes: arrayRemove(globalGuestName) });
                 } else {
@@ -465,6 +521,38 @@
                     await updateDoc(docRef, { likes: arrayUnion(globalGuestName) });
                 }
             } catch (e) { console.log("Errore like", e); }
+        };
+
+        // Gestore Doppio Tap nelle miniature
+        let clickTimer = null;
+        window.handlePhotoClick = (index, docId, event) => {
+            const target = event.currentTarget;
+            const currentTime = new Date().getTime();
+            const lastClick = parseInt(target.dataset.lastClick || '0');
+            const timeDiff = currentTime - lastClick;
+
+            if (timeDiff < 300 && timeDiff > 0) {
+                // Doppio tap
+                clearTimeout(clickTimer);
+                target.dataset.lastClick = '0';
+                window.toggleLike(docId, event, true);
+                
+                // Ricava coordinate esatte per il cuore animato
+                let clientX = event.clientX; let clientY = event.clientY;
+                if(event.touches && event.touches.length > 0) {
+                    clientX = event.touches[0].clientX; clientY = event.touches[0].clientY;
+                } else if (event.changedTouches && event.changedTouches.length > 0) {
+                    clientX = event.changedTouches[0].clientX; clientY = event.changedTouches[0].clientY;
+                }
+                window.showFloatingHeart(clientX, clientY);
+            } else {
+                // Singolo tap
+                target.dataset.lastClick = currentTime.toString();
+                clickTimer = setTimeout(() => {
+                    target.dataset.lastClick = '0';
+                    window.openLightbox(index);
+                }, 250); // Piccolo ritardo per capire se l'utente farà doppio tap
+            }
         };
 
         window.openLikesModal = (docId, event) => {
@@ -476,12 +564,13 @@
                 listEl.innerHTML = '<p class="text-gray-400 text-sm text-center italic mt-6 font-serif">Sii il primo a mettere mi piace!</p>';
             } else {
                 [...likesArr].reverse().forEach(liker => {
+                    const displayName = liker.startsWith("Fantasma") ? "Un Fantasma 👻" : liker;
                     listEl.insertAdjacentHTML('beforeend', `
                         <div class="flex items-center gap-4 bg-white border border-gray-100 p-3 rounded-2xl shadow-sm">
                             <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-wedding-brown shrink-0">
                                 <i data-lucide="user" class="w-5 h-5"></i>
                             </div>
-                            <span class="text-sm font-bold text-wedding-dark">${liker}</span>
+                            <span class="text-sm font-bold text-wedding-dark">${displayName}</span>
                         </div>
                     `);
                 });
@@ -498,7 +587,6 @@
             setTimeout(() => document.getElementById('likes-modal-overlay').classList.add('hidden'), 300);
         };
 
-        // Swipe up per chiudere lista like
         let likesTouchStartY = 0;
         document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.getElementById('likes-modal').addEventListener('touchend', e => { if (e.changedTouches[0].screenY > likesTouchStartY + 60) window.closeLikesModal(); }, {passive: true});
@@ -513,30 +601,29 @@
                 return;
             }
             
-            // Ripristina griglia a 3 colonne se c'erano empty states
             gallery.className = "grid grid-cols-3 gap-2 w-full";
             gallery.innerHTML = "";
             globalGalleryData = [];
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             
-            snapshot.forEach((docSnap, i) => {
+            snapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                if(data.type !== 'image') return; // Ignora vecchi audio nel db
+                if(data.type !== 'image') return; 
                 const docId = docSnap.id;
                 const likesArr = data.likes || [];
                 currentLikesMap[docId] = likesArr;
                 const isLiked = localLikes.includes(docId);
                 
+                const pIndex = globalGalleryData.length; // Indice corretto
                 globalGalleryData.push({...data, docId});
                 
-                const cleanName = data.guestName.split(' ')[0] || 'Invitato';
+                const cleanName = data.guestName ? data.guestName.split(' ')[0] : 'Ospite';
                 const heartIcon = isLiked ? `<i data-lucide="heart" class="w-3 h-3 fill-red-500 text-red-500"></i>` : `<i data-lucide="heart" class="w-3 h-3"></i>`;
                 
                 gallery.insertAdjacentHTML('beforeend', `
-                    <div class="relative aspect-square rounded-xl overflow-hidden shadow-sm bg-gray-100 photo-reveal cursor-pointer" onclick="window.openLightbox(${i})">
+                    <div class="relative aspect-square rounded-xl overflow-hidden shadow-sm bg-gray-100 photo-reveal cursor-pointer select-none" onclick="window.handlePhotoClick(${pIndex}, '${docId}', event)">
                         <img src="${data.url.replace('/upload/', '/upload/w_300,c_fill,q_auto:eco/')}" class="w-full h-full object-cover no-save">
                         
-                        <!-- Overlay Sfumato Inferiore: Nome e Like -->
                         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-1.5 pt-6 flex justify-between items-end">
                             <p class="text-[8px] text-white font-bold truncate pr-1">by ${cleanName}</p>
                             ${likesArr.length > 0 ? `
@@ -551,7 +638,6 @@
             });
             lucide.createIcons();
             
-            // Aggiorna Lightbox in tempo reale se è aperta
             if(!document.getElementById('lightbox-modal').classList.contains('hidden')) {
                 window.updateLightboxUI();
             }
@@ -573,15 +659,15 @@
         window.updateLightboxUI = () => {
             if (globalGalleryData.length === 0) return;
             const item = globalGalleryData[currentLightboxIndex];
+            if (!item) return;
             const docId = item.docId;
             
             document.getElementById('lightbox-img').src = item.url.replace("/upload/", "/upload/w_1200,q_auto/");
             
-            const cleanAuthor = item.guestName ? item.guestName : "Un Ospite";
+            const cleanAuthor = item.guestName ? (item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName) : "Un Ospite";
             document.getElementById('lightbox-author').innerHTML = `Scattata da <span class="text-wedding-gold">${cleanAuthor}</span>`;
             document.getElementById('lightbox-comment').innerText = item.comment ? `"${item.comment}"` : '';
             
-            // Gestione Like in Lightbox
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             const isLiked = localLikes.includes(docId);
             const likesArr = currentLikesMap[docId] || [];
@@ -593,15 +679,17 @@
                 : `<i data-lucide="heart" class="w-6 h-6 text-gray-400"></i>`;
             
             const deleteContainer = document.getElementById('lightbox-delete-container');
-            if (item.deviceId && item.deviceId === deviceId) {
-                deleteContainer.innerHTML = `<button onclick="window.deletePhoto('${docId}')" class="p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-full active:scale-95 transition-all flex items-center gap-2"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
-            } else {
-                deleteContainer.innerHTML = '';
+            if (deleteContainer) {
+                if (item.deviceId && item.deviceId === deviceId) {
+                    deleteContainer.innerHTML = `<button onclick="window.deletePhoto('${docId}')" class="p-2 text-red-500 bg-red-50 hover:bg-red-100 rounded-full active:scale-95 transition-all flex items-center gap-2"><i data-lucide="trash-2" class="w-5 h-5"></i></button>`;
+                } else {
+                    deleteContainer.innerHTML = '';
+                }
             }
 
             const listBtn = document.getElementById('lightbox-likes-btn');
             if(likesArr.length > 0) {
-                listBtn.innerHTML = `Piace a ${likesArr.length} ${likesArr.length === 1 ? 'persona' : 'persone'}`;
+                listBtn.innerHTML = `Visualizza ${likesArr.length} mi piace`;
                 listBtn.onclick = (e) => window.openLikesModal(docId, e);
                 listBtn.classList.remove('hidden');
             } else {
@@ -610,8 +698,33 @@
             lucide.createIcons();
         };
 
-        window.prevLightbox = (e) => { e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length; window.updateLightboxUI(); };
-        window.nextLightbox = (e) => { e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length; window.updateLightboxUI(); };
+        // Gestore Doppio Tap nella Lightbox
+        let lightboxClickTime = 0;
+        window.handleLightboxDoubleClick = (event) => {
+            const currentTime = new Date().getTime();
+            const timeDiff = currentTime - lightboxClickTime;
+            
+            if (timeDiff < 300 && timeDiff > 0) {
+                const item = globalGalleryData[currentLightboxIndex];
+                if(item) {
+                    window.toggleLike(item.docId, event, true);
+                    
+                    let clientX = event.clientX; let clientY = event.clientY;
+                    if(event.touches && event.touches.length > 0) {
+                        clientX = event.touches[0].clientX; clientY = event.touches[0].clientY;
+                    } else if (event.changedTouches && event.changedTouches.length > 0) {
+                        clientX = event.changedTouches[0].clientX; clientY = event.changedTouches[0].clientY;
+                    }
+                    window.showFloatingHeart(clientX, clientY);
+                }
+                lightboxClickTime = 0;
+            } else {
+                lightboxClickTime = currentTime;
+            }
+        };
+
+        window.prevLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length; window.updateLightboxUI(); };
+        window.nextLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length; window.updateLightboxUI(); };
 
         let touchStartX = 0;
         document.getElementById('lightbox-modal').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
@@ -620,21 +733,28 @@
             if (e.changedTouches[0].screenX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // 7. AREA RISERVATA (PIN)
+        // 7. AREA RISERVATA ADMIN
         window.handleSecretAdmin = (e) => {
             if(e) e.preventDefault();
             adminTapCount++;
+            
             const icon = document.getElementById('lock-icon');
-            icon.classList.add('scale-150', 'text-wedding-brown');
-            setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150);
+            if(icon) {
+                icon.classList.add('scale-150', 'text-wedding-brown');
+                setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150);
+            }
             
             clearTimeout(adminTapTimer);
-            if (adminTapCount >= 10) {
-                isSecretUnlocked = true; adminTapCount = 0;
+            if (adminTapCount >= 3) {
+                isSecretUnlocked = true; 
+                adminTapCount = 0;
                 confetti({ particleCount: 30, origin: { y: 0.1 }, colors: ['#D4AF37'] }); 
                 window.openPinModal();
             } else {
-                adminTapTimer = setTimeout(() => { if (adminTapCount > 0) { isSecretUnlocked = false; adminTapCount = 0; window.openPinModal(); } }, 800); 
+                adminTapTimer = setTimeout(() => { 
+                    adminTapCount = 0; 
+                    isSecretUnlocked = false; 
+                }, 800); 
             }
         };
 
@@ -647,7 +767,12 @@
                 if (enteredPin.length === 4) {
                     setTimeout(() => {
                         if (enteredPin === PIN_CODE && isSecretUnlocked) {
-                            window.location.href = "admin.html";
+                            try {
+                                window.location.href = "admin.html";
+                            } catch(err) {
+                                alert("Accesso consentito! (In modalità preview non è possibile navigare. Provalo sul server vero)");
+                                window.closePinModal();
+                            }
                         } else {
                             const dots = document.querySelector('.pin-dot').parentElement;
                             dots.classList.add('animate-bounce');
