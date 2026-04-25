@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -10,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Libreria per la creazione del file ZIP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
@@ -51,9 +49,6 @@
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
 
-    <!-- ========================================== -->
-    <!-- 1. PRIVACY SCREEN -->
-    <!-- ========================================== -->
     <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-end p-8 pb-16 text-center overflow-hidden">
         <div class="absolute inset-0 z-0">
             <img src="https://res.cloudinary.com/dvjgznbzm/image/upload/v1776095870/5a760781-b72b-40e1-bd75-85816fbd659a_zbmpht.jpg" class="w-full h-full object-cover object-center" alt="Sfondo Sposi">
@@ -75,12 +70,8 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 2. MAIN APP CONTAINER -->
-    <!-- ========================================== -->
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-32 relative">
         
-        <!-- HEADER COMUNE -->
         <header class="w-full bg-wedding-bg/95 backdrop-blur-md pt-4 pb-4 px-4 border-b border-orange-50 shadow-sm sticky top-0 z-40">
             <div class="flex justify-between items-center max-w-2xl mx-auto mb-4 px-2">
                 <button onclick="openSettings()" class="text-wedding-dark/40 hover:text-wedding-brown transition-colors p-2 touch-manipulation">
@@ -95,7 +86,6 @@
                 </button>
             </div>
 
-            <!-- Banner Sposi -->
             <div class="max-w-md mx-auto bg-gradient-to-r from-[#EFE5D8] to-[#F5F0E8] rounded-[40px] p-5 flex items-center gap-5 shadow-sm relative overflow-hidden">
                 <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-wedding-gold font-serif text-lg border border-wedding-gold/20 shrink-0 shadow-inner">M&M</div>
                 <div class="flex-grow">
@@ -108,7 +98,6 @@
             </div>
         </header>
 
-        <!-- SCHERMATA 1: CARICA FOTO -->
         <main id="screen-carica" class="w-full max-w-2xl px-4 flex flex-col items-center py-8">
             <div class="text-center mb-8">
                 <h3 class="font-serif text-2xl text-wedding-dark mb-1">Condividi i tuoi momenti</h3>
@@ -134,7 +123,6 @@
             </div>
         </main>
 
-        <!-- SCHERMATA 2: GALLERIA FOTO -->
         <main id="screen-galleria" class="w-full max-w-4xl px-2 hidden flex-col items-center py-8">
             <div class="flex justify-between items-center w-full mb-6 px-2">
                 <h3 class="font-serif text-2xl text-wedding-dark">Galleria Foto</h3>
@@ -147,7 +135,6 @@
         </main>
     </div>
 
-    <!-- NAVBAR INFERIORE STANDARD -->
     <nav id="standard-nav" class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-orange-50 h-24 flex items-center justify-center px-4 gap-4 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
         <button id="btn-tab-carica" onclick="switchTab('carica')" class="flex-1 h-14 rounded-2xl font-bold uppercase tracking-widest text-[10px] border border-gray-200 text-gray-500 active-tab transition-all flex items-center justify-center gap-2">
             <i data-lucide="camera" class="w-4 h-4"></i> Carica Foto
@@ -157,7 +144,6 @@
         </button>
     </nav>
 
-    <!-- NAVBAR ADMIN (Visibile solo in modalità sposi) -->
     <nav id="admin-nav" class="fixed bottom-0 inset-x-0 bg-wedding-dark/95 backdrop-blur-md border-t border-gray-800 h-24 hidden items-center justify-between px-6 z-[60] shadow-2xl">
         <button onclick="window.toggleSelectAll()" class="flex flex-col items-center justify-center gap-1 text-white/70 hover:text-white transition-colors">
             <div class="w-6 h-6 rounded border border-white/50 flex items-center justify-center" id="admin-select-all-icon"></div>
@@ -179,7 +165,6 @@
         </button>
     </nav>
 
-    <!-- OVERLAY CARICAMENTO / ZIP -->
     <div id="upload-overlay" class="fixed inset-0 z-[200] bg-wedding-bg/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-10 text-center">
         <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 shadow-xl border border-orange-50">
             <i data-lucide="cloud-upload" id="overlay-icon" class="w-10 h-10 text-wedding-brown animate-bounce"></i>
@@ -193,11 +178,6 @@
         <p id="progress-percentage" class="mt-6 font-mono text-wedding-brown font-bold text-lg">0%</p>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODALI DI SISTEMA -->
-    <!-- ========================================== -->
-
-    <!-- LIGHTBOX FOTO -->
     <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-wedding-bg hidden flex-col items-center justify-center touch-none">
         <div class="absolute top-0 inset-x-0 h-16 bg-wedding-bg/95 backdrop-blur-md border-b border-orange-50 flex items-center justify-between px-4 z-50 shadow-sm">
             <button onclick="closeLightbox()" class="text-wedding-dark flex items-center gap-2 p-2 active:scale-95 transition-transform">
@@ -228,7 +208,6 @@
         </div>
     </div>
 
-    <!-- MODAL LISTA LIKE -->
     <div id="likes-modal-overlay" class="fixed inset-0 z-[130] bg-black/40 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
     <div id="likes-modal" class="slide-up-modal fixed bottom-0 inset-x-0 z-[140] bg-white rounded-t-[40px] shadow-2xl flex flex-col max-h-[70vh]">
         <div class="p-6 border-b border-gray-50 flex justify-between items-center sticky top-0 bg-white rounded-t-[40px] z-10">
@@ -238,7 +217,6 @@
         <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-3 pb-12 bg-white"></div>
     </div>
 
-    <!-- MODAL IMPOSTAZIONI (Cambio Nome) -->
     <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/50 hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white w-full max-w-xs rounded-3xl p-8 text-center shadow-2xl">
             <h3 class="font-serif text-xl mb-6 text-wedding-dark">Le tue Info</h3>
@@ -251,7 +229,6 @@
         </div>
     </div>
 
-    <!-- MODAL TASTIERINO PIN ADMIN -->
     <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
         <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
         <div class="w-16 h-16 bg-wedding-gold/20 rounded-full flex items-center justify-center mb-4 border border-wedding-gold/30">
@@ -282,10 +259,8 @@
         </div>
     </div>
 
-    <!-- INPUT FILE NASCOSTO -->
     <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFileSelection(event)">
 
-    <!-- JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -301,8 +276,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const galleryRef = collection(db, "live_gallery");
-        const CLOUD_NAME = "dvjgznbzm";
-        const UPLOAD_PRESET = "wedding_live_feed";
+        
+        // --- CONFIGURAZIONE IMAGEKIT + VERCEL ---
+        const IMAGEKIT_PUBLIC_KEY = "public_nToS+Jzq5Za2U5OITm7RD1JconY=";
+        const IMAGEKIT_AUTH_ENDPOINT = "https://michela-maurizio-qr-code.vercel.app/api/auth";
 
         let selectedFilesArray = [];
         let globalGalleryData = []; 
@@ -326,6 +303,15 @@
         }
 
         lucide.createIcons();
+
+        // Funzione per ottimizzare le immagini ImageKit (Velocità Massima)
+        window.getOptimizedUrl = (url, thumb = false) => {
+            if (!url) return "";
+            if (url.includes('imagekit.io')) {
+                return thumb ? url + "?tr=w-400,h-400,fo-auto,q-70" : url + "?tr=w-1200,fo-auto,q-80";
+            }
+            return url;
+        };
 
         // --- ANIMAZIONE CUORE FLUTTUANTE ---
         window.showFloatingHeart = (x, y) => {
@@ -461,10 +447,26 @@
             for (let i = 0; i < total; i++) {
                 let item = selectedFilesArray[i];
                 try {
-                    const formData = new FormData(); formData.append("file", item.file); formData.append("upload_preset", UPLOAD_PRESET);
-                    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
+                    // 1. Richiedi firma e token a Vercel
+                    const authRes = await fetch(IMAGEKIT_AUTH_ENDPOINT);
+                    const authData = await authRes.json();
+
+                    // 2. Prepara il pacchetto per ImageKit
+                    const formData = new FormData(); 
+                    formData.append("file", item.file); 
+                    formData.append("fileName", `wedding_${Date.now()}.jpg`);
+                    formData.append("publicKey", IMAGEKIT_PUBLIC_KEY);
+                    formData.append("signature", authData.signature);
+                    formData.append("expire", authData.expire);
+                    formData.append("token", authData.token);
+                    
+                    // 3. Carica la foto su ImageKit
+                    const res = await fetch("https://upload.imagekit.io/api/v1/files/upload", { method: "POST", body: formData });
                     const data = await res.json();
-                    await addDoc(galleryRef, { url: data.secure_url, type: 'image', comment: item.comment, guestName: finalName, likes: [], deviceId: deviceId, timestamp: serverTimestamp() });
+                    
+                    // 4. Salva il link nel database Firebase
+                    await addDoc(galleryRef, { url: data.url, type: 'image', comment: item.comment, guestName: finalName, likes: [], deviceId: deviceId, timestamp: serverTimestamp() });
+                    
                     let percent = Math.round(((i + 1) / total) * 100);
                     bar.style.width = percent + '%'; ring.style.left = percent + '%'; text.innerText = percent + '%';
                 } catch (e) { console.error(e); }
@@ -512,7 +514,6 @@
         let clickTimer = null;
         window.handlePhotoClick = (index, docId, event) => {
             if(isAdmin) {
-                // Modalità God Mode: seleziona le foto
                 if(selectedForAdmin.has(docId)) selectedForAdmin.delete(docId);
                 else selectedForAdmin.add(docId);
                 window.renderGallery();
@@ -601,7 +602,7 @@
 
                 gallery.insertAdjacentHTML('beforeend', `
                     <div class="relative aspect-square rounded-xl overflow-hidden shadow-sm bg-gray-100 cursor-pointer select-none ${isSelected ? 'scale-[0.97] admin-selected' : 'photo-reveal'}" onclick="window.handlePhotoClick(${pIndex}, '${docId}', event)">
-                        <img src="${item.url.replace('/upload/', '/upload/w_300,c_fill,q_auto:eco/')}" class="w-full h-full object-cover no-save">
+                        <img src="${window.getOptimizedUrl(item.url, true)}" class="w-full h-full object-cover no-save">
                         ${adminOverlay}
                         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-1.5 pt-6 flex justify-between items-end z-10 pointer-events-none">
                             <p class="text-[8px] text-white font-bold truncate pr-1">by ${cleanName}</p>
@@ -650,7 +651,7 @@
             if (!item) return;
             const docId = item.docId;
             
-            document.getElementById('lightbox-img').src = item.url.replace("/upload/", "/upload/w_1200,q_auto/");
+            document.getElementById('lightbox-img').src = window.getOptimizedUrl(item.url, false);
             const cleanAuthor = item.guestName ? (item.guestName.startsWith("Fantasma") ? "Un Fantasma 👻" : item.guestName) : "Un Ospite";
             document.getElementById('lightbox-author').innerHTML = `Scattata da <span class="text-wedding-gold">${cleanAuthor}</span>`;
             document.getElementById('lightbox-comment').innerText = item.comment ? `"${item.comment}"` : '';
@@ -708,7 +709,7 @@
         // ==========================================
         window.handleSecretAdmin = (e) => {
             if(e) e.preventDefault();
-            if(isAdmin) { window.exitAdminMode(); return; } // Toggle se già admin
+            if(isAdmin) { window.exitAdminMode(); return; } 
             
             adminTapCount++;
             const icon = document.getElementById('lock-icon');
@@ -739,7 +740,6 @@
                             
                             window.closePinModal();
                             
-                            // Forza visuale galleria e nascondi header standard sposi
                             document.getElementById('screen-carica').classList.add('hidden');
                             document.getElementById('screen-galleria').classList.replace('hidden', 'flex');
                             
@@ -780,7 +780,6 @@
                 btnDown.classList.add('opacity-50', 'pointer-events-none');
             }
 
-            // Aggiorna icona "Seleziona Tutto"
             const selectAllIcon = document.getElementById('admin-select-all-icon');
             if(count === globalGalleryData.length && count > 0) {
                 selectAllIcon.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-white"></i>`;
@@ -796,9 +795,9 @@
 
         window.toggleSelectAll = () => {
             if(selectedForAdmin.size === globalGalleryData.length) {
-                selectedForAdmin.clear(); // Deseleziona tutto
+                selectedForAdmin.clear();
             } else {
-                globalGalleryData.forEach(item => selectedForAdmin.add(item.docId)); // Seleziona tutto
+                globalGalleryData.forEach(item => selectedForAdmin.add(item.docId));
             }
             window.renderGallery();
             window.updateAdminToolbar();
@@ -813,11 +812,9 @@
                 }
                 selectedForAdmin.clear();
                 window.updateAdminToolbar();
-                // renderGallery() viene chiamato in automatico da onSnapshot
             }
         };
 
-        // Download ZIP intelligente lato Client
         window.downloadSelectedZIP = async () => {
             if (selectedForAdmin.size === 0) return;
             
@@ -845,8 +842,7 @@
                 const item = globalGalleryData.find(g => g.docId === docId);
                 if(item) {
                     try {
-                        // Scarica la versione in alta qualità per l'album
-                        const url = item.url.replace('/upload/', '/upload/w_1800,q_auto/');
+                        const url = window.getOptimizedUrl(item.url, false);
                         const response = await fetch(url);
                         const blob = await response.blob();
                         const safeName = item.guestName.replace(/[^a-zA-Z0-9]/g, '_') || 'Ospite';
@@ -885,6 +881,3 @@
     </script>
 </body>
 </html>
-
-
-```
