@@ -1,0 +1,9 @@
+{
+  "name": "wedding-bridge-vercel",
+  "version": "1.0.0",
+  "description": "Ponte di autenticazione per ImageKit - Matrimonio Michela e Maurizio",
+  "main": "api/auth.js",
+  "dependencies": {
+    "imagekit": "^1.3.0"
+  }
+}
