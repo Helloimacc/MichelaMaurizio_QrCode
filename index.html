@@ -37,8 +37,9 @@
             color: #2D2926; 
             -webkit-tap-highlight-color: transparent; 
             scroll-behavior: smooth; 
+            /* Sfondo aggiornato con nuova immagine in scala di grigi e sfocata */
             background-image: linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), 
-                              url('https://res.cloudinary.com/dvjgznbzm/image/upload/e_blur:300,f_auto,q_auto/v1777478209/0148_090426_p7ohpg.jpg');
+                              url('https://res.cloudinary.com/dvjgznbzm/image/upload/e_grayscale,e_blur:300,f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -70,7 +71,6 @@
     <!-- SCHERMATA PRIVACY INIZIALE -->
     <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-end p-8 pb-16 text-center overflow-hidden">
         <div class="absolute inset-0 z-0">
-            <!-- Immagine aggiornata con effetto bianco e nero (e_grayscale) tramite url -->
             <img src="https://res.cloudinary.com/dvjgznbzm/image/upload/e_grayscale,f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg" class="w-full h-full object-cover object-center grayscale" alt="Sfondo Sposi">
             <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px]"></div>
         </div>
@@ -93,18 +93,18 @@
     <!-- MAIN APP -->
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-32 relative">
         
-        <!-- HEADER MINIMALISTA (Effetto Vetro) -->
+        <!-- HEADER MINIMALISTA (Layout sistemato per distanziare gli elementi) -->
         <header class="w-full bg-white/40 backdrop-blur-md pt-5 pb-5 px-6 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)] sticky top-0 z-40">
-            <div class="flex justify-between items-center max-w-2xl mx-auto">
-                <button onclick="openSettings()" class="text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 touch-manipulation">
+            <div class="relative flex justify-center items-center max-w-2xl mx-auto w-full min-h-[32px]">
+                <button onclick="openSettings()" class="absolute left-0 text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 touch-manipulation z-10">
                     Cambia Nome
                 </button>
                 
-                <div class="flex flex-col items-center">
-                    <h1 class="font-serif text-3xl font-light text-wedding-dark tracking-wide">Michela <span class="italic text-wedding-brown">&amp;</span> Maurizio</h1>
+                <div class="flex flex-col items-center px-20">
+                    <h1 class="font-serif text-2xl sm:text-3xl font-light text-wedding-dark tracking-wide text-center leading-none">Michela <span class="italic text-wedding-brown">&amp;</span> Maurizio</h1>
                 </div>
                 
-                <button onclick="handleSecretAdmin(event)" class="text-wedding-dark/30 hover:text-wedding-brown transition-colors p-1 touch-manipulation relative">
+                <button onclick="handleSecretAdmin(event)" class="absolute right-0 text-wedding-dark/30 hover:text-wedding-brown transition-colors p-1 touch-manipulation z-10">
                     <i data-lucide="user" class="w-5 h-5 transition-transform" id="lock-icon"></i>
                     <div id="admin-badge" class="hidden absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></div>
                 </button>
@@ -118,7 +118,7 @@
                 <p class="text-[10px] text-gray-500 uppercase tracking-widest">i tuoi scatti migliori</p>
             </div>
 
-            <!-- BOX CARICAMENTO MIGLIORATO -->
+            <!-- BOX CARICAMENTO -->
             <button onclick="triggerUpload()" class="bg-white/60 backdrop-blur-md border-2 border-wedding-sage/40 p-12 rounded-[32px] w-full max-w-xs flex flex-col items-center gap-4 active:scale-95 transition-all shadow-sm group hover:bg-white/80 hover:border-wedding-sage/60">
                 <div class="w-16 h-16 rounded-full flex items-center justify-center text-wedding-sage border-2 border-wedding-sage/30 group-hover:scale-110 transition-transform bg-white shadow-sm relative">
                     <i data-lucide="camera" class="w-6 h-6"></i>
@@ -132,7 +132,7 @@
                 </div>
             </button>
 
-            <!-- ZONA DI CONFERMA MINIMALISTA -->
+            <!-- ZONA DI CONFERMA -->
             <div id="selected-files-list" class="w-full max-w-md mt-10 hidden bg-white/80 backdrop-blur-md p-6 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/60 relative scroll-mt-24">
                 
                 <div class="flex flex-col items-center text-center mb-6">
@@ -168,17 +168,17 @@
         </main>
     </div>
 
-    <!-- NAVBAR INFERIORE (Effetto Vetro) -->
+    <!-- NAVBAR INFERIORE -->
     <nav id="standard-nav" class="fixed bottom-0 inset-x-0 bg-white/60 backdrop-blur-lg border-t border-white/40 h-20 flex items-center justify-center px-6 gap-6 z-50">
         <button id="btn-tab-carica" onclick="switchTab('carica')" class="flex-1 h-12 rounded-full font-bold uppercase tracking-widest text-[9px] border border-transparent text-gray-500 active-tab transition-all flex items-center justify-center gap-2">
-            <i data-lucide="camera" class="w-4 h-4"></i> Carica
+            <i data-lucide="home" class="w-4 h-4"></i> Home
         </button>
         <button id="btn-tab-galleria" onclick="switchTab('galleria')" class="flex-1 h-12 rounded-full font-bold uppercase tracking-widest text-[9px] border border-transparent text-gray-500 transition-all flex items-center justify-center gap-2">
             <i data-lucide="layout-grid" class="w-4 h-4"></i> Galleria
         </button>
     </nav>
 
-    <!-- NAVBAR ADMIN (Visibile solo in modalità sposi) -->
+    <!-- NAVBAR ADMIN -->
     <nav id="admin-nav" class="fixed bottom-0 inset-x-0 bg-wedding-dark/95 backdrop-blur-md border-t border-gray-800 h-24 hidden items-center justify-between px-6 z-[60] shadow-2xl">
         <button onclick="window.toggleSelectAll()" class="flex flex-col items-center justify-center gap-1 text-white/70 hover:text-white transition-colors">
             <div class="w-6 h-6 rounded border border-white/50 flex items-center justify-center" id="admin-select-all-icon"></div>
@@ -945,6 +945,7 @@
     </script>
 </body>
 </html>
+
 
 
 ```
