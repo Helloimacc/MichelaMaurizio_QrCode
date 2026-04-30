@@ -37,9 +37,8 @@
             color: #2D2926; 
             -webkit-tap-highlight-color: transparent; 
             scroll-behavior: smooth; 
-            /* Sfondo aggiornato con nuova immagine in scala di grigi e sfocata */
             background-image: linear-gradient(rgba(253, 251, 247, 0.88), rgba(253, 251, 247, 0.88)), 
-                              url('https://res.cloudinary.com/dvjgznbzm/image/upload/e_grayscale,e_blur:300,f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg');
+                              url('https://res.cloudinary.com/dvjgznbzm/image/upload/e_blur:300,f_auto,q_auto/v1777493437/0091_090426_odtvbs.jpg');
             background-attachment: fixed;
             background-size: cover;
             background-position: center;
@@ -68,17 +67,22 @@
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
 
-    <!-- SCHERMATA PRIVACY INIZIALE -->
-    <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-end p-8 pb-16 text-center overflow-hidden">
+    <!-- SCHERMATA PRIVACY / SPLASH SCREEN CINEMATOGRAFICO -->
+    <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 pb-16 text-center overflow-hidden transition-opacity duration-700 bg-black">
         <div class="absolute inset-0 z-0">
-            <img src="https://res.cloudinary.com/dvjgznbzm/image/upload/e_grayscale,f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg" class="w-full h-full object-cover object-center grayscale" alt="Sfondo Sposi">
-            <div class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px]"></div>
+            <!-- Nota: L'immagine sorgente è a colori, il bianco e nero è dato dalla classe 'grayscale' per permettere l'animazione -->
+            <img id="privacy-bg-img" src="https://res.cloudinary.com/dvjgznbzm/image/upload/f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg" class="w-full h-full object-cover object-center grayscale transition-all duration-1000" alt="Sfondo Sposi">
+            <div id="privacy-bg-overlay" class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px] transition-opacity duration-1000"></div>
         </div>
 
-        <div class="max-w-sm w-full relative z-10">
+        <!-- TESTI SPOSTATI IN ALTO -->
+        <div id="privacy-content-top" class="relative z-10 mt-6 transition-opacity duration-700 w-full">
             <h1 class="font-serif text-[32px] leading-tight mb-2 text-white drop-shadow-lg">Benvenuti al nostro<br>Matrimonio</h1>
-            <p class="text-xs uppercase tracking-widest text-white/90 mb-8 font-bold drop-shadow-md">09 Maggio 2026</p>
-            
+            <p class="text-xs uppercase tracking-widest text-white/90 font-bold drop-shadow-md">09 Maggio 2026</p>
+        </div>
+
+        <!-- FORM IN BASSO -->
+        <div id="privacy-content-bottom" class="max-w-sm w-full relative z-10 transition-opacity duration-700 mb-2">
             <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white/20 mb-6 text-left">
                 <input type="text" id="guest-name" placeholder="Inserisci il tuo nome (Opzionale)" class="w-full bg-gray-50 border border-gray-200 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center placeholder:font-normal placeholder:text-gray-400 shadow-inner">
                 <label class="flex items-start gap-3 cursor-pointer">
@@ -93,7 +97,7 @@
     <!-- MAIN APP -->
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-32 relative">
         
-        <!-- HEADER MINIMALISTA (Layout sistemato per distanziare gli elementi) -->
+        <!-- HEADER MINIMALISTA -->
         <header class="w-full bg-white/40 backdrop-blur-md pt-5 pb-5 px-6 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)] sticky top-0 z-40">
             <div class="relative flex justify-center items-center max-w-2xl mx-auto w-full min-h-[32px]">
                 <button onclick="openSettings()" class="absolute left-0 text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 touch-manipulation z-10">
@@ -118,7 +122,6 @@
                 <p class="text-[10px] text-gray-500 uppercase tracking-widest">i tuoi scatti migliori</p>
             </div>
 
-            <!-- BOX CARICAMENTO -->
             <button onclick="triggerUpload()" class="bg-white/60 backdrop-blur-md border-2 border-wedding-sage/40 p-12 rounded-[32px] w-full max-w-xs flex flex-col items-center gap-4 active:scale-95 transition-all shadow-sm group hover:bg-white/80 hover:border-wedding-sage/60">
                 <div class="w-16 h-16 rounded-full flex items-center justify-center text-wedding-sage border-2 border-wedding-sage/30 group-hover:scale-110 transition-transform bg-white shadow-sm relative">
                     <i data-lucide="camera" class="w-6 h-6"></i>
@@ -132,9 +135,7 @@
                 </div>
             </button>
 
-            <!-- ZONA DI CONFERMA -->
             <div id="selected-files-list" class="w-full max-w-md mt-10 hidden bg-white/80 backdrop-blur-md p-6 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/60 relative scroll-mt-24">
-                
                 <div class="flex flex-col items-center text-center mb-6">
                     <div class="w-10 h-10 bg-green-50/80 rounded-full flex items-center justify-center text-green-500 mb-3 border border-green-100/50">
                         <i data-lucide="check" class="w-5 h-5"></i>
@@ -255,7 +256,7 @@
         <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-3 pb-12 bg-white"></div>
     </div>
 
-    <!-- MODAL IMPOSTAZIONI (Cambio Nome) -->
+    <!-- MODAL IMPOSTAZIONI -->
     <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/40 hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white/95 backdrop-blur-xl w-full max-w-xs rounded-[32px] p-8 text-center shadow-2xl border border-white">
             <h3 class="font-serif text-2xl font-light mb-6 text-wedding-dark">Le tue Info</h3>
@@ -345,7 +346,6 @@
 
         lucide.createIcons();
 
-        // Funzione per ottimizzare le immagini ImageKit
         window.getOptimizedUrl = (url, thumb = false) => {
             if (!url) return "";
             if (url.includes('imagekit.io')) {
@@ -354,7 +354,6 @@
             return url;
         };
 
-        // --- ANIMAZIONE CUORE FLUTTUANTE ---
         window.showFloatingHeart = (x, y) => {
             const heart = document.createElement('div');
             heart.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>`;
@@ -371,7 +370,6 @@
             });
         };
 
-        // 1. GESTIONE TAB & ACCESSO
         window.switchTab = (tab) => {
             if(isAdmin) return; 
             sessionStorage.setItem('wedding_active_tab', tab);
@@ -389,14 +387,36 @@
             }
         };
 
+        // --- GESTIONE LOGICA DI ACCESSO (SPLASH SCREEN) ---
         window.onload = () => {
             const savedName = sessionStorage.getItem('wedding_session_name');
             const savedTab = sessionStorage.getItem('wedding_active_tab') || 'carica';
+            
+            const privacyScreen = document.getElementById('privacy-screen');
+            const bgImg = document.getElementById('privacy-bg-img');
+            const bgOverlay = document.getElementById('privacy-bg-overlay');
+            const contentTop = document.getElementById('privacy-content-top');
+            const contentBottom = document.getElementById('privacy-content-bottom');
+
             if(savedName) {
                 globalGuestName = savedName;
-                document.getElementById('privacy-screen').style.display = 'none';
-                document.getElementById('main-app').classList.replace('hidden', 'flex');
-                window.switchTab(savedTab);
+                
+                // Preparo lo Splash Screen (nessun testo, immagine a colori)
+                contentTop.style.display = 'none';
+                contentBottom.style.display = 'none';
+                
+                bgImg.classList.remove('transition-all', 'duration-1000', 'grayscale');
+                bgOverlay.style.display = 'none';
+
+                // Mantengo lo splash screen visibile per 1 secondo, poi sfumo
+                setTimeout(() => {
+                    privacyScreen.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        privacyScreen.style.display = 'none';
+                        document.getElementById('main-app').classList.replace('hidden', 'flex');
+                        window.switchTab(savedTab);
+                    }, 700); // Attesa della fine della transizione opacity
+                }, 1000);
             }
         };
 
@@ -406,16 +426,35 @@
             btn.classList.toggle('opacity-50', btn.disabled);
         };
 
+        // --- GESTIONE LOGICA PRIMO ACCESSO (EFFETTO WOW 2.5 SECONDI) ---
         window.enterApp = () => {
             let name = document.getElementById('guest-name').value.trim();
             globalGuestName = name ? name : `Invitato #${Math.floor(1000 + Math.random() * 9000)}`; 
             sessionStorage.setItem('wedding_session_name', globalGuestName);
-            document.getElementById('privacy-screen').classList.add('fade-out-up');
+            
+            const privacyScreen = document.getElementById('privacy-screen');
+            const bgImg = document.getElementById('privacy-bg-img');
+            const bgOverlay = document.getElementById('privacy-bg-overlay');
+            const contentTop = document.getElementById('privacy-content-top');
+            const contentBottom = document.getElementById('privacy-content-bottom');
+
+            // 1. Sfumo via dolcemente testi e form
+            contentTop.classList.add('opacity-0');
+            contentBottom.classList.add('opacity-0');
+
+            // 2. Rendo nitida l'immagine e le dò i colori (tramite CSS)
+            bgImg.classList.remove('grayscale');
+            bgOverlay.classList.add('opacity-0');
+
+            // 3. Aspetto 2.5 secondi per far ammirare l'immagine nitida, poi passo all'app
             setTimeout(() => {
-                document.getElementById('privacy-screen').style.display = 'none';
-                document.getElementById('main-app').classList.replace('hidden', 'flex');
-                window.switchTab('carica');
-            }, 600);
+                privacyScreen.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => {
+                    privacyScreen.style.display = 'none';
+                    document.getElementById('main-app').classList.replace('hidden', 'flex');
+                    window.switchTab('carica');
+                }, 700);
+            }, 2500);
         };
 
         window.openSettings = () => {
@@ -437,7 +476,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // 3. UPLOAD FILE
         window.triggerUpload = () => { document.getElementById('file-input').click(); };
         
         window.handleFileSelection = (event) => {
@@ -556,7 +594,6 @@
             }
         };
 
-        // 4. LIKE LOGIC
         window.toggleLike = async (docId, event, isDoubleClick = false) => {
             if(event && !isDoubleClick) event.stopPropagation(); 
             const docRef = doc(db, "live_gallery", docId);
@@ -635,7 +672,6 @@
         document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.getElementById('likes-modal').addEventListener('touchend', e => { if (e.changedTouches[0].screenY > likesTouchStartY + 60) window.closeLikesModal(); }, {passive: true});
 
-        // 5. RENDER GRIGLIA A 3 COLONNE E MODALITA' ADMIN
         window.renderGallery = () => {
             const gallery = document.getElementById("gallery-grid");
             if(globalGalleryData.length === 0) {
@@ -696,7 +732,6 @@
             if(!document.getElementById('lightbox-modal').classList.contains('hidden') && !isAdmin) { window.updateLightboxUI(); }
         });
 
-        // 6. LIGHTBOX FULL SCREEN
         window.openLightbox = (index) => {
             currentLightboxIndex = index;
             window.updateLightboxUI();
@@ -768,9 +803,6 @@
             if (e.changedTouches[0].screenX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
-        // ==========================================
-        // 7. FUNZIONI GOD MODE (AREA SPOSI INTEGRATA)
-        // ==========================================
         window.handleSecretAdmin = (e) => {
             if(e) e.preventDefault();
             if(isAdmin) { window.exitAdminMode(); return; } 
@@ -795,7 +827,6 @@
                 if (enteredPin.length === 4) {
                     setTimeout(() => {
                         if (enteredPin === PIN_CODE && isSecretUnlocked) {
-                            // Attivazione God Mode
                             isAdmin = true;
                             selectedForAdmin.clear();
                             document.getElementById('admin-badge').classList.remove('hidden'); 
@@ -945,7 +976,6 @@
     </script>
 </body>
 </html>
-
 
 
 ```
