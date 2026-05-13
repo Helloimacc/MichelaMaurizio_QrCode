@@ -56,20 +56,17 @@
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
 
-    <!-- SCHERMATA PRIVACY / SPLASH SCREEN CINEMATOGRAFICO -->
     <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 pb-16 text-center overflow-hidden transition-opacity duration-700 bg-black">
         <div class="absolute inset-0 z-0">
             <img id="privacy-bg-img" src="https://res.cloudinary.com/dvjgznbzm/image/upload/f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg" class="w-full h-full object-cover object-center grayscale transition-all duration-1000" alt="Sfondo Sposi">
             <div id="privacy-bg-overlay" class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px] transition-opacity duration-1000"></div>
         </div>
 
-        <!-- TESTI SPOSTATI IN ALTO -->
         <div id="privacy-content-top" class="relative z-10 mt-6 transition-opacity duration-700 w-full">
             <h1 class="font-serif text-[32px] leading-tight mb-2 text-white drop-shadow-lg">Benvenuti al nostro<br>Matrimonio</h1>
             <p class="text-xs uppercase tracking-widest text-white/90 font-bold drop-shadow-md">09 Maggio 2026</p>
         </div>
 
-        <!-- FORM IN BASSO -->
         <div id="privacy-content-bottom" class="max-w-sm w-full relative z-10 transition-opacity duration-700 mb-2">
             <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white/20 mb-6 text-left">
                 <input type="text" id="guest-name" placeholder="Inserisci il tuo nome (Opzionale)" class="w-full bg-gray-50 border border-gray-200 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center placeholder:font-normal placeholder:text-gray-400 shadow-inner">
@@ -82,10 +79,8 @@
         </div>
     </div>
 
-    <!-- MAIN APP -->
     <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-10 relative">
         
-        <!-- HEADER MINIMALISTA -->
         <header class="w-full bg-white/40 backdrop-blur-md pt-5 pb-5 px-6 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)] sticky top-0 z-40">
             <div class="relative flex justify-center items-center max-w-2xl mx-auto w-full min-h-[32px]">
                 <button onclick="openSettings()" class="absolute left-0 text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 touch-manipulation z-10">
@@ -98,10 +93,8 @@
             </div>
         </header>
 
-        <!-- CONTENUTO UNICO (UPLOAD + GALLERIA) -->
         <main class="w-full max-w-4xl px-4 flex flex-col items-center pt-8 pb-16 relative mt-4">
             
-            <!-- BOTTONE UPLOAD E BANNER DOWNLOAD (STICKY) -->
             <div class="sticky top-[85px] z-30 w-full flex flex-col items-center gap-3 pb-8 pointer-events-none">
                 <button onclick="triggerUpload()" class="pointer-events-auto w-full max-w-sm bg-white/80 backdrop-blur-xl border border-wedding-sage/30 p-4 rounded-2xl flex items-center gap-4 active:scale-95 transition-all shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:bg-white hover:border-wedding-sage/50">
                     <div class="w-12 h-12 rounded-full flex items-center justify-center text-wedding-sage bg-white shadow-sm shrink-0 border border-wedding-sage/10">
@@ -119,7 +112,6 @@
                 </div>
             </div>
 
-            <!-- ZONA DI CONFERMA UPLOAD -->
             <div id="selected-files-list" class="w-full max-w-md mb-10 hidden bg-white/90 backdrop-blur-md p-6 rounded-[32px] shadow-lg border border-white relative scroll-mt-32 z-20">
                 <div class="flex flex-col items-center text-center mb-6">
                     <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-3 border border-green-100">
@@ -139,17 +131,14 @@
                 </button>
             </div>
 
-            <!-- INTESTATURA GALLERIA -->
             <div class="flex justify-between items-end w-full mb-4 px-2 z-20">
                 <h3 class="font-serif text-2xl font-light text-wedding-dark">Tutti i ricordi</h3>
             </div>
             
-            <!-- GRIGLIA GALLERIA -->
             <div id="gallery-grid" class="grid grid-cols-3 gap-2 w-full z-20 pb-20"></div>
         </main>
     </div>
 
-    <!-- OVERLAY CARICAMENTO -->
     <div id="upload-overlay" class="fixed inset-0 z-[200] bg-wedding-bg/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-10 text-center">
         <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 shadow-md border border-orange-50/50">
             <i data-lucide="cloud-upload" id="overlay-icon" class="w-10 h-10 text-wedding-brown animate-bounce"></i>
@@ -163,7 +152,6 @@
         <p id="progress-percentage" class="mt-6 font-mono text-wedding-brown font-bold text-lg">0%</p>
     </div>
 
-    <!-- LIGHTBOX FOTO -->
     <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-wedding-bg hidden flex-col items-center justify-center touch-none">
         <div class="absolute top-0 inset-x-0 h-16 bg-wedding-bg/95 backdrop-blur-md border-b border-orange-50/50 flex items-center justify-between px-4 z-50 shadow-sm">
             <button onclick="closeLightbox()" class="text-wedding-dark flex items-center gap-2 p-2 active:scale-95 transition-transform">
@@ -197,7 +185,6 @@
         </div>
     </div>
 
-    <!-- MODAL LISTA LIKE -->
     <div id="likes-modal-overlay" class="fixed inset-0 z-[130] bg-black/20 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
     <div id="likes-modal" class="slide-up-modal fixed bottom-0 inset-x-0 z-[140] bg-white rounded-t-[40px] shadow-2xl flex flex-col max-h-[70vh]">
         <div class="p-6 border-b border-gray-50 flex justify-between items-center sticky top-0 bg-white rounded-t-[40px] z-10">
@@ -207,7 +194,6 @@
         <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-3 pb-12 bg-white"></div>
     </div>
 
-    <!-- MODAL IMPOSTAZIONI -->
     <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/40 hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white/95 backdrop-blur-xl w-full max-w-xs rounded-[32px] p-8 text-center shadow-2xl border border-white">
             <h3 class="font-serif text-2xl font-light mb-6 text-wedding-dark">Le tue Info</h3>
@@ -220,14 +206,12 @@
         </div>
     </div>
 
-    <!-- TASTO SCORRI IN ALTO -->
     <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 bg-wedding-sage text-white p-3.5 rounded-full shadow-[0_8px_30px_rgba(93,109,94,0.4)] z-[90] opacity-0 pointer-events-none transition-all duration-300 translate-y-4 hover:bg-[#4a574b] active:scale-95 touch-manipulation">
         <i data-lucide="arrow-up" class="w-5 h-5"></i>
     </button>
 
     <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFileSelection(event)">
 
-    <!-- JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -271,22 +255,18 @@
 
         lucide.createIcons();
 
-        // -------------------------------------------------------------
-        // QUALITA' DEFINITIVA: Bilanciamento Banda / Download
-        // -------------------------------------------------------------
+        // --- GESTIONE QUALITÀ IMMAGINI ---
         window.getOptimizedUrl = (url, thumb = false) => {
             if (!url) return "";
             if (url.includes('imagekit.io')) {
-                // thumb = true: Griglia (Massimo risparmio banda: 300x300px, qualità 60)
-                // thumb = false: Lightbox/Download (Qualità originale 1200px intatta + formato web moderno)
-                return thumb ? url + "?tr=w-300,h-300,fo-auto,q-60" : url + "?tr=f-auto,pr-true";
+                // thumb = true: Griglia (Miniature leggere e di qualità media per risparmiare Giga)
+                // thumb = false: Lightbox (Qualità altissima, perfetta per il download o visione a tutto schermo)
+                return thumb ? url + "?tr=w-400,h-400,fo-auto,q-75" : url + "?tr=w-1200,q-100,f-auto";
             }
             return url;
         };
 
-        // -------------------------------------------------------------
-        // RISOLUZIONE BUG BANDA: Compressione Client-Side prima dell'Upload
-        // -------------------------------------------------------------
+        // --- COMPRESSIONE PRE-UPLOAD ---
         const compressImageClientSide = (file) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -296,7 +276,7 @@
                     img.src = event.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        // Ridimensioniamo l'immagine gigante del telefono a max 1200px
+                        // Riportato a 1200px per il massimo risparmio di banda in upload
                         const MAX_WIDTH = 1200; 
                         let scaleSize = 1;
                         if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
@@ -306,14 +286,14 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                         
-                        // Convertiamo il canvas compresso di nuovo in un file JPEG (Qualità 80%)
+                        // Compressione JPG ottimizzata (80%)
                         canvas.toBlob((blob) => {
                             const newFile = new File([blob], file.name, {
                                 type: 'image/jpeg',
                                 lastModified: Date.now()
                             });
                             resolve(newFile);
-                        }, 'image/jpeg', 0.8); 
+                        }, 'image/jpeg', 0.80); 
                     };
                 };
             });
@@ -325,6 +305,7 @@
             heart.className = 'fixed z-[9999] pointer-events-none transform -translate-x-1/2 -translate-y-1/2 scale-50 opacity-0 transition-all duration-300 ease-out drop-shadow-2xl';
             heart.style.left = x + 'px'; heart.style.top = y + 'px';
             document.body.appendChild(heart);
+
             requestAnimationFrame(() => {
                 heart.classList.remove('scale-50', 'opacity-0'); heart.classList.add('scale-110', 'opacity-90');
                 setTimeout(() => {
@@ -487,14 +468,13 @@
             for (let i = 0; i < total; i++) {
                 let item = selectedFilesArray[i];
                 try {
-                    // Magia: Comprimo l'immagine sul telefono PRIMA di mandarla a ImageKit!
                     const compressedFile = await compressImageClientSide(item.file);
 
                     const authRes = await fetch(IMAGEKIT_AUTH_ENDPOINT);
                     const authData = await authRes.json();
 
                     const formData = new FormData(); 
-                    formData.append("file", compressedFile); // Uso il file compresso!
+                    formData.append("file", compressedFile);
                     formData.append("fileName", `wedding_${Date.now()}.jpg`);
                     formData.append("publicKey", IMAGEKIT_PUBLIC_KEY);
                     formData.append("signature", authData.signature);
@@ -609,9 +589,6 @@
         document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.getElementById('likes-modal').addEventListener('touchend', e => { if (e.changedTouches[0].screenY > likesTouchStartY + 60) window.closeLikesModal(); }, {passive: true});
 
-        // -------------------------------------------------------------
-        // RISOLUZIONE BUG BANDA: Render Intelligente (Nessun Ricaricamento DOM)
-        // -------------------------------------------------------------
         window.renderGallery = () => {
             const gallery = document.getElementById("gallery-grid");
             
@@ -623,14 +600,12 @@
             
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             
-            // 1. Eliminiamo dalla griglia le foto che non esistono più nel database
             const currentIds = new Set(currentDisplayData.map(item => item.docId));
             Array.from(gallery.children).forEach(child => {
                 const childId = child.id.replace('photo-', '');
                 if (!currentIds.has(childId)) { child.remove(); }
             });
 
-            // 2. Aggiungiamo o aggiorniamo solo quello che serve
             currentDisplayData.forEach((item, pIndex) => {
                 const docId = item.docId;
                 const likesArr = currentLikesMap[docId] || item.likes || [];
@@ -641,20 +616,19 @@
                 let existingEl = document.getElementById(`photo-${docId}`);
                 
                 if (existingEl) {
-                    // Se la foto esiste già, aggiorniamo solo i cuori senza ricaricare l'immagine!
                     const likesContainer = existingEl.querySelector('.likes-wrapper');
                     if(likesArr.length > 0) {
                         likesContainer.innerHTML = `<div class="flex items-center gap-1 text-white bg-black/30 px-1.5 py-0.5 rounded-full backdrop-blur-sm">${heartIcon}<span class="text-[8px] font-bold">${likesArr.length}</span></div>`;
                     } else { likesContainer.innerHTML = ''; }
                     existingEl.onclick = (e) => window.handlePhotoClick(pIndex, docId, e);
                 } else {
-                    // Se la foto non esiste, la creiamo per la prima volta
                     const el = document.createElement('div');
                     el.id = `photo-${docId}`;
+                    // Aggiunto "pointer-events-none" all'immagine così l'utente NON PUÒ tenere premuto per salvare la miniatura dalla griglia
                     el.className = "relative aspect-square rounded-2xl overflow-hidden shadow-sm bg-gray-100/50 border border-white/50 cursor-pointer select-none photo-reveal";
                     el.onclick = (e) => window.handlePhotoClick(pIndex, docId, e);
                     el.innerHTML = `
-                        <img src="${window.getOptimizedUrl(item.url, true)}" loading="lazy" class="w-full h-full object-cover">
+                        <img src="${window.getOptimizedUrl(item.url, true)}" loading="lazy" class="w-full h-full object-cover pointer-events-none">
                         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-2 pt-8 flex justify-between items-end z-10 pointer-events-none">
                             <p class="text-[8px] text-white/90 font-medium truncate pr-1">by ${cleanName}</p>
                             <div class="likes-wrapper">
@@ -665,7 +639,6 @@
                     gallery.appendChild(el);
                 }
                 
-                // Manteniamo l'ordine cronologico corretto usando CSS order
                 const finalEl = document.getElementById(`photo-${docId}`);
                 if(finalEl) finalEl.style.order = pIndex;
             });
