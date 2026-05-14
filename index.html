@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -48,25 +49,39 @@
         .slide-up-modal.open { transform: translateY(0); }
         .photo-reveal { animation: reveal 0.5s ease-out forwards; opacity: 0; }
         @keyframes reveal { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .no-save { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; pointer-events: none; }
         .touch-manipulation { touch-action: manipulation; }
+        
+        /* Stile Navigazione Attiva Verde */
+        .active-tab { 
+            background-color: #5D6D5E !important; 
+            color: #FFFFFF !important; 
+            border-color: #5D6D5E !important; 
+            box-shadow: 0 4px 14px rgba(93, 109, 94, 0.2) !important; 
+        }
         
         #ring-icon { transition: left 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
         .custom-checkbox:checked { background-color: #B89470; border-color: #B89470; }
+        .admin-selected { border-color: #5D6D5E !important; }
     </style>
 </head>
 <body class="relative min-h-[100dvh] overflow-x-hidden flex flex-col font-sans">
 
+    <!-- SCHERMATA PRIVACY / SPLASH SCREEN CINEMATOGRAFICO -->
     <div id="privacy-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-between p-8 pb-16 text-center overflow-hidden transition-opacity duration-700 bg-black">
         <div class="absolute inset-0 z-0">
+            <!-- Nota: L'immagine sorgente è a colori, il bianco e nero è dato dalla classe 'grayscale' per permettere l'animazione -->
             <img id="privacy-bg-img" src="https://res.cloudinary.com/dvjgznbzm/image/upload/f_auto,q_auto/v1777491855/0202_090426_e8lgxm.jpg" class="w-full h-full object-cover object-center grayscale transition-all duration-1000" alt="Sfondo Sposi">
             <div id="privacy-bg-overlay" class="absolute inset-0 bg-gradient-to-b from-black/10 via-black/40 to-black/80 backdrop-blur-[2px] transition-opacity duration-1000"></div>
         </div>
 
+        <!-- TESTI SPOSTATI IN ALTO -->
         <div id="privacy-content-top" class="relative z-10 mt-6 transition-opacity duration-700 w-full">
             <h1 class="font-serif text-[32px] leading-tight mb-2 text-white drop-shadow-lg">Benvenuti al nostro<br>Matrimonio</h1>
             <p class="text-xs uppercase tracking-widest text-white/90 font-bold drop-shadow-md">09 Maggio 2026</p>
         </div>
 
+        <!-- FORM IN BASSO -->
         <div id="privacy-content-bottom" class="max-w-sm w-full relative z-10 transition-opacity duration-700 mb-2">
             <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-white/20 mb-6 text-left">
                 <input type="text" id="guest-name" placeholder="Inserisci il tuo nome (Opzionale)" class="w-full bg-gray-50 border border-gray-200 text-base font-bold p-4 rounded-2xl mb-4 focus:outline-none focus:border-wedding-brown transition-colors text-center placeholder:font-normal placeholder:text-gray-400 shadow-inner">
@@ -79,8 +94,10 @@
         </div>
     </div>
 
-    <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-10 relative">
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden flex-col items-center w-full flex-grow pb-32 relative">
         
+        <!-- HEADER MINIMALISTA -->
         <header class="w-full bg-white/40 backdrop-blur-md pt-5 pb-5 px-6 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)] sticky top-0 z-40">
             <div class="relative flex justify-center items-center max-w-2xl mx-auto w-full min-h-[32px]">
                 <button onclick="openSettings()" class="absolute left-0 text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 touch-manipulation z-10">
@@ -90,61 +107,107 @@
                 <div class="flex flex-col items-center px-20">
                     <h1 class="font-serif text-2xl sm:text-3xl font-light text-wedding-dark tracking-wide text-center leading-none">Michela <span class="italic text-wedding-brown">&amp;</span> Maurizio</h1>
                 </div>
+                
+                <button onclick="handleSecretAdmin(event)" class="absolute right-0 text-wedding-dark/30 hover:text-wedding-brown transition-colors p-1 touch-manipulation z-10">
+                    <i data-lucide="user" class="w-5 h-5 transition-transform" id="lock-icon"></i>
+                    <div id="admin-badge" class="hidden absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border border-white"></div>
+                </button>
             </div>
         </header>
 
-        <main class="w-full max-w-4xl px-4 flex flex-col items-center pt-8 pb-16 relative mt-4">
-            
-            <div class="sticky top-[85px] z-30 w-full flex flex-col items-center gap-3 pb-8 pointer-events-none">
-                <button onclick="triggerUpload()" class="pointer-events-auto w-full max-w-sm bg-white/80 backdrop-blur-xl border border-wedding-sage/30 p-4 rounded-2xl flex items-center gap-4 active:scale-95 transition-all shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:bg-white hover:border-wedding-sage/50">
-                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-wedding-sage bg-white shadow-sm shrink-0 border border-wedding-sage/10">
-                        <i data-lucide="camera" class="w-5 h-5"></i>
-                    </div>
-                    <div class="flex flex-col items-start text-left justify-center py-1">
-                        <span class="font-serif text-[17px] text-wedding-dark leading-tight">Clicca qui per caricare<br>i tuoi momenti</span>
-                    </div>
-                </button>
-
-                <div class="pointer-events-auto bg-white/70 border border-wedding-sage/20 py-2 px-6 rounded-full text-center backdrop-blur-xl shadow-sm w-max mx-auto">
-                    <p class="text-[9px] text-wedding-sage uppercase tracking-widest font-bold flex items-center justify-center gap-2">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Tieni premuto su una foto per salvarla
-                    </p>
-                </div>
+        <!-- SCHERMATA CARICAMENTO -->
+        <main id="screen-carica" class="w-full max-w-2xl px-4 flex flex-col items-center py-12 relative">
+            <div class="text-center mb-10">
+                <h3 class="font-serif text-3xl text-wedding-dark font-light mb-2">Condividi qui</h3>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">i tuoi scatti migliori</p>
             </div>
 
-            <div id="selected-files-list" class="w-full max-w-md mb-10 hidden bg-white/90 backdrop-blur-md p-6 rounded-[32px] shadow-lg border border-white relative scroll-mt-32 z-20">
+            <button onclick="triggerUpload()" class="bg-white/60 backdrop-blur-md border-2 border-wedding-sage/40 p-12 rounded-[32px] w-full max-w-xs flex flex-col items-center gap-4 active:scale-95 transition-all shadow-sm group hover:bg-white/80 hover:border-wedding-sage/60">
+                <div class="w-16 h-16 rounded-full flex items-center justify-center text-wedding-sage border-2 border-wedding-sage/30 group-hover:scale-110 transition-transform bg-white shadow-sm relative">
+                    <i data-lucide="camera" class="w-6 h-6"></i>
+                    <div class="absolute top-0 right-0 w-5 h-5 bg-wedding-brown rounded-full flex items-center justify-center border-2 border-white translate-x-0 -translate-y-0">
+                        <i data-lucide="plus" class="w-3 h-3 text-white"></i>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center gap-1">
+                    <span class="font-serif italic text-xl text-wedding-dark">Tocca per caricare</span>
+                    <span class="text-[10px] text-gray-600 font-medium px-2 text-center mt-1 leading-tight">Apri la galleria e scegli<br>fino a 5 foto alla volta</span>
+                </div>
+            </button>
+
+            <div id="selected-files-list" class="w-full max-w-md mt-10 hidden bg-white/80 backdrop-blur-md p-6 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/60 relative scroll-mt-24">
                 <div class="flex flex-col items-center text-center mb-6">
-                    <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center text-green-500 mb-3 border border-green-100">
+                    <div class="w-10 h-10 bg-green-50/80 rounded-full flex items-center justify-center text-green-500 mb-3 border border-green-100/50">
                         <i data-lucide="check" class="w-5 h-5"></i>
                     </div>
                     <h4 class="font-serif text-xl text-wedding-dark mb-1">Hai scelto <span id="files-count" class="text-wedding-brown font-semibold">0</span> foto</h4>
-                    <p id="limit-warning" class="text-[10px] bg-red-50 text-red-500 px-3 py-1.5 rounded-lg font-bold hidden mt-3 border border-red-100">
-                        Limite superato: Abbiamo tenuto le prime 10.
+                    <p id="limit-warning" class="text-[10px] bg-red-50/80 text-red-500 px-3 py-1.5 rounded-lg font-bold hidden mt-3 border border-red-100/50">
+                        Limite superato: Abbiamo tenuto le prime 5.
                     </p>
                 </div>
 
                 <div id="preview-container" class="grid grid-cols-1 gap-3 max-h-[40vh] overflow-y-auto pr-2 mb-6"></div>
-                <div class="w-full h-[1px] bg-gray-200 mb-6"></div>
+                
+                <div class="w-full h-[1px] bg-gray-200/50 mb-6"></div>
 
                 <button onclick="startUpload()" class="w-full bg-wedding-sage text-white font-bold uppercase tracking-[0.15em] text-[11px] py-4 rounded-2xl shadow-md flex justify-center items-center gap-2 active:scale-95 transition-transform hover:bg-[#4a574b]">
                     <i data-lucide="send" class="w-4 h-4"></i> Invia alla Galleria
                 </button>
             </div>
+        </main>
 
-            <div class="flex justify-between items-end w-full mb-4 px-2 z-20">
-                <h3 class="font-serif text-2xl font-light text-wedding-dark">Tutti i ricordi</h3>
+        <!-- SCHERMATA GALLERIA -->
+        <main id="screen-galleria" class="w-full max-w-4xl px-2 hidden flex-col items-center py-8">
+            <div class="flex justify-between items-end w-full mb-6 px-4">
+                <h3 class="font-serif text-3xl font-light text-wedding-dark">Galleria</h3>
+                <button onclick="forceVisualRefresh(event)" class="text-[9px] uppercase tracking-widest font-bold text-wedding-brown/70 hover:text-wedding-brown transition-colors border-b border-wedding-brown/20 pb-0.5 flex items-center gap-1 touch-manipulation">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i> Aggiorna
+                </button>
             </div>
             
-            <div id="gallery-grid" class="grid grid-cols-3 gap-2 w-full z-20 pb-20"></div>
+            <div id="gallery-grid" class="grid grid-cols-3 gap-2 w-full"></div>
         </main>
     </div>
 
+    <!-- NAVBAR INFERIORE -->
+    <nav id="standard-nav" class="fixed bottom-0 inset-x-0 bg-white/60 backdrop-blur-lg border-t border-white/40 h-20 flex items-center justify-center px-6 gap-6 z-50">
+        <button id="btn-tab-carica" onclick="switchTab('carica')" class="flex-1 h-12 rounded-full font-bold uppercase tracking-widest text-[9px] border border-transparent text-gray-500 active-tab transition-all flex items-center justify-center gap-2">
+            <i data-lucide="home" class="w-4 h-4"></i> Home
+        </button>
+        <button id="btn-tab-galleria" onclick="switchTab('galleria')" class="flex-1 h-12 rounded-full font-bold uppercase tracking-widest text-[9px] border border-transparent text-gray-500 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="layout-grid" class="w-4 h-4"></i> Galleria
+        </button>
+    </nav>
+
+    <!-- NAVBAR ADMIN -->
+    <nav id="admin-nav" class="fixed bottom-0 inset-x-0 bg-wedding-dark/95 backdrop-blur-md border-t border-gray-800 h-24 hidden items-center justify-between px-6 z-[60] shadow-2xl">
+        <button onclick="window.toggleSelectAll()" class="flex flex-col items-center justify-center gap-1 text-white/70 hover:text-white transition-colors">
+            <div class="w-6 h-6 rounded border border-white/50 flex items-center justify-center" id="admin-select-all-icon"></div>
+            <span class="text-[9px] uppercase tracking-widest font-bold">Tutte</span>
+        </button>
+        
+        <div class="flex items-center gap-4">
+            <button onclick="window.downloadSelectedZIP()" class="w-12 h-12 rounded-full bg-wedding-gold text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform" id="admin-btn-download">
+                <i data-lucide="download" class="w-5 h-5"></i>
+            </button>
+            <button onclick="window.deleteSelectedPhotos()" class="w-12 h-12 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform" id="admin-btn-delete">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <button onclick="window.exitAdminMode()" class="flex flex-col items-center justify-center gap-1 text-white/70 hover:text-white transition-colors">
+            <i data-lucide="x" class="w-6 h-6"></i>
+            <span class="text-[9px] uppercase tracking-widest font-bold">Esci</span>
+        </button>
+    </nav>
+
+    <!-- OVERLAY CARICAMENTO -->
     <div id="upload-overlay" class="fixed inset-0 z-[200] bg-wedding-bg/95 backdrop-blur-md hidden flex flex-col items-center justify-center p-10 text-center">
         <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center mb-8 shadow-md border border-orange-50/50">
             <i data-lucide="cloud-upload" id="overlay-icon" class="w-10 h-10 text-wedding-brown animate-bounce"></i>
         </div>
         <h3 id="overlay-title" class="font-serif text-2xl font-light text-wedding-dark mb-1">Custodendo i ricordi...</h3>
-        <p id="overlay-subtitle" class="text-[10px] uppercase tracking-widest text-gray-400 mb-12">Ottimizzazione e invio in corso</p>
+        <p id="overlay-subtitle" class="text-[10px] uppercase tracking-widest text-gray-400 mb-12">Non chiudere l'app</p>
         <div class="w-full max-w-xs h-1.5 bg-gray-200/50 rounded-full relative overflow-visible">
             <div id="progress-bar" class="h-full bg-wedding-brown rounded-full transition-all duration-300" style="width: 0%"></div>
             <div id="ring-icon" class="absolute top-1/2 -translate-y-1/2 text-2xl pointer-events-none" style="left: 0%; transform: translate(-50%, -50%);">💍</div>
@@ -152,6 +215,7 @@
         <p id="progress-percentage" class="mt-6 font-mono text-wedding-brown font-bold text-lg">0%</p>
     </div>
 
+    <!-- LIGHTBOX FOTO -->
     <div id="lightbox-modal" class="fixed inset-0 z-[110] bg-wedding-bg hidden flex-col items-center justify-center touch-none">
         <div class="absolute top-0 inset-x-0 h-16 bg-wedding-bg/95 backdrop-blur-md border-b border-orange-50/50 flex items-center justify-between px-4 z-50 shadow-sm">
             <button onclick="closeLightbox()" class="text-wedding-dark flex items-center gap-2 p-2 active:scale-95 transition-transform">
@@ -164,16 +228,13 @@
         <button onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 text-wedding-dark/20 hover:text-wedding-dark/50 p-4 z-50"><i data-lucide="chevron-left" class="w-10 h-10"></i></button>
         <button onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 text-wedding-dark/20 hover:text-wedding-dark/50 p-4 z-50"><i data-lucide="chevron-right" class="w-10 h-10"></i></button>
 
-        <img id="lightbox-img" src="" class="max-w-full max-h-[60vh] object-contain mb-[140px] mt-16 rounded-xl shadow-sm" onclick="window.handleLightboxDoubleClick(event)">
+        <img id="lightbox-img" src="" class="max-w-full max-h-[60vh] object-contain no-save mb-[140px] mt-16 rounded-xl shadow-sm" draggable="false" onclick="window.handleLightboxDoubleClick(event)">
         
         <div class="absolute bottom-0 inset-x-0 bg-white/90 backdrop-blur-md rounded-t-[40px] border-t border-white p-6 flex flex-col items-center min-h-[140px] justify-center z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)]">
             <div class="w-full flex justify-between items-start mb-4">
                 <div class="flex-grow pr-4">
                     <p id="lightbox-author" class="font-light text-wedding-dark text-sm"></p>
                     <p id="lightbox-comment" class="text-gray-500 text-xs italic leading-tight mt-1"></p>
-                    <p class="text-[9px] text-wedding-sage uppercase tracking-widest font-bold mt-2 opacity-70 flex items-center gap-1">
-                        <i data-lucide="download" class="w-3 h-3"></i> Tieni premuto per salvare
-                    </p>
                 </div>
                 <button id="lightbox-action-like" class="p-3 bg-white rounded-full shrink-0 active:scale-90 transition-transform shadow-sm border border-gray-100 touch-manipulation">
                     <i data-lucide="heart" id="lightbox-heart-icon" class="w-5 h-5 text-gray-300"></i>
@@ -185,6 +246,7 @@
         </div>
     </div>
 
+    <!-- MODAL LISTA LIKE -->
     <div id="likes-modal-overlay" class="fixed inset-0 z-[130] bg-black/20 hidden opacity-0 transition-opacity duration-300 backdrop-blur-sm"></div>
     <div id="likes-modal" class="slide-up-modal fixed bottom-0 inset-x-0 z-[140] bg-white rounded-t-[40px] shadow-2xl flex flex-col max-h-[70vh]">
         <div class="p-6 border-b border-gray-50 flex justify-between items-center sticky top-0 bg-white rounded-t-[40px] z-10">
@@ -194,6 +256,7 @@
         <div id="likes-list" class="overflow-y-auto p-6 flex flex-col gap-3 pb-12 bg-white"></div>
     </div>
 
+    <!-- MODAL IMPOSTAZIONI -->
     <div id="settings-modal" class="fixed inset-0 z-[120] bg-black/40 hidden items-center justify-center p-6 backdrop-blur-md">
         <div class="bg-white/95 backdrop-blur-xl w-full max-w-xs rounded-[32px] p-8 text-center shadow-2xl border border-white">
             <h3 class="font-serif text-2xl font-light mb-6 text-wedding-dark">Le tue Info</h3>
@@ -206,12 +269,40 @@
         </div>
     </div>
 
-    <button id="back-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 right-6 bg-wedding-sage text-white p-3.5 rounded-full shadow-[0_8px_30px_rgba(93,109,94,0.4)] z-[90] opacity-0 pointer-events-none transition-all duration-300 translate-y-4 hover:bg-[#4a574b] active:scale-95 touch-manipulation">
-        <i data-lucide="arrow-up" class="w-5 h-5"></i>
-    </button>
+    <!-- MODAL TASTIERINO PIN ADMIN -->
+    <div id="pin-modal" class="fixed inset-0 z-[120] bg-wedding-dark/95 backdrop-blur-md hidden flex-col items-center justify-center px-8">
+        <button onclick="closePinModal()" class="absolute top-8 right-6 text-white/50 p-2"><i data-lucide="x" class="w-6 h-6"></i></button>
+        <div class="w-16 h-16 bg-wedding-gold/10 rounded-full flex items-center justify-center mb-4 border border-wedding-gold/20">
+            <i data-lucide="lock" class="w-6 h-6 text-wedding-gold"></i>
+        </div>
+        <h3 class="font-serif text-white text-2xl font-light mb-2 text-center">Area Sposi</h3>
+        <p class="text-[9px] text-gray-400 uppercase tracking-widest mb-10 font-bold">Inserisci il PIN di gestione</p>
+        
+        <div class="flex gap-4 mb-10">
+            <div class="w-2.5 h-2.5 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-2.5 h-2.5 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-2.5 h-2.5 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+            <div class="w-2.5 h-2.5 rounded-full border border-wedding-gold pin-dot transition-colors"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-6 w-full max-w-xs px-6">
+            <button onclick="enterPin('1')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">1</button>
+            <button onclick="enterPin('2')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">2</button>
+            <button onclick="enterPin('3')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">3</button>
+            <button onclick="enterPin('4')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">4</button>
+            <button onclick="enterPin('5')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">5</button>
+            <button onclick="enterPin('6')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">6</button>
+            <button onclick="enterPin('7')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/20 touch-manipulation">7</button>
+            <button onclick="enterPin('8')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">8</button>
+            <button onclick="enterPin('9')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">9</button>
+            <div></div>
+            <button onclick="enterPin('0')" class="w-16 h-16 mx-auto rounded-full border border-white/10 text-white text-2xl font-light active:bg-white/10 touch-manipulation">0</button>
+            <button onclick="clearPin()" class="w-16 h-16 mx-auto text-white/50 text-xs uppercase tracking-widest font-bold touch-manipulation">Canc</button>
+        </div>
+    </div>
 
     <input type="file" id="file-input" accept="image/*" multiple style="display:none;" onchange="handleFileSelection(event)">
 
+    <!-- JAVASCRIPT & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
@@ -228,24 +319,24 @@
         const db = getFirestore(app);
         const galleryRef = collection(db, "live_gallery");
         
+        // --- CONFIGURAZIONE IMAGEKIT + VERCEL ---
         const IMAGEKIT_PUBLIC_KEY = "public_nToS+Jzq5Za2U5OITm7RD1JconY=";
         const IMAGEKIT_AUTH_ENDPOINT = "https://michela-maurizio-qr-code.vercel.app/api/auth";
 
         let selectedFilesArray = [];
         let globalGalleryData = []; 
-        let currentDisplayData = []; 
         let currentLightboxIndex = 0;
         let globalGuestName = ""; 
         let currentLikesMap = {}; 
-
-        const DUMMY_PHOTOS = [
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1777491855/0202_090426_e8lgxm.jpg", comment: "Siete bellissimi!", guestName: "Fotografo", likes: ["Michela", "Maurizio"], docId: "dummy1" },
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1777493437/0091_090426_odtvbs.jpg", comment: "Che emozione", guestName: "Zia Rosa", likes: [], docId: "dummy2" },
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1775465246/IMG_2955_vczlqf.jpg", comment: "Evviva gli sposi", guestName: "Luca", likes: ["Michela"], docId: "dummy3" },
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1774796845/IMG_4307_withcw.jpg", comment: "", guestName: "Marco", likes: [], docId: "dummy4" },
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1774796848/IMG_8780_y48grg.jpg", comment: "Wow!!", guestName: "Sara", likes: ["Luca", "Marco"], docId: "dummy5" },
-            { url: "https://res.cloudinary.com/dvjgznbzm/image/upload/v1774796846/IMG_3396_rebrbg.jpg", comment: "Festeggiamo", guestName: "Amico", likes: [], docId: "dummy6" }
-        ];
+        
+        // VARIABILI ADMIN / GOD MODE
+        let isAdmin = false; 
+        let selectedForAdmin = new Set(); 
+        let adminTapCount = 0; 
+        let adminTapTimer = null; 
+        let isSecretUnlocked = false; 
+        let enteredPin = ""; 
+        const PIN_CODE = "2026";
 
         let deviceId = localStorage.getItem('wedding_device_id');
         if (!deviceId) {
@@ -255,48 +346,12 @@
 
         lucide.createIcons();
 
-        // --- GESTIONE QUALITÀ IMMAGINI ---
         window.getOptimizedUrl = (url, thumb = false) => {
             if (!url) return "";
             if (url.includes('imagekit.io')) {
-                // thumb = true: Griglia (Miniature leggere e di qualità media per risparmiare Giga)
-                // thumb = false: Lightbox (Qualità altissima, perfetta per il download o visione a tutto schermo)
-                return thumb ? url + "?tr=w-400,h-400,fo-auto,q-75" : url + "?tr=w-1200,q-100,f-auto";
+                return thumb ? url + "?tr=w-400,h-400,fo-auto,q-70" : url + "?tr=w-1200,fo-auto,q-80";
             }
             return url;
-        };
-
-        // --- COMPRESSIONE PRE-UPLOAD ---
-        const compressImageClientSide = (file) => {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        // Riportato a 1200px per il massimo risparmio di banda in upload
-                        const MAX_WIDTH = 1200; 
-                        let scaleSize = 1;
-                        if (img.width > MAX_WIDTH) { scaleSize = MAX_WIDTH / img.width; }
-                        
-                        canvas.width = img.width * scaleSize;
-                        canvas.height = img.height * scaleSize;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        // Compressione JPG ottimizzata (80%)
-                        canvas.toBlob((blob) => {
-                            const newFile = new File([blob], file.name, {
-                                type: 'image/jpeg',
-                                lastModified: Date.now()
-                            });
-                            resolve(newFile);
-                        }, 'image/jpeg', 0.80); 
-                    };
-                };
-            });
         };
 
         window.showFloatingHeart = (x, y) => {
@@ -315,8 +370,28 @@
             });
         };
 
+        window.switchTab = (tab) => {
+            if(isAdmin) return; 
+            sessionStorage.setItem('wedding_active_tab', tab);
+            const carica = document.getElementById('screen-carica');
+            const galleria = document.getElementById('screen-galleria');
+            const btnCarica = document.getElementById('btn-tab-carica');
+            const btnGalleria = document.getElementById('btn-tab-galleria');
+
+            if(tab === 'carica') {
+                carica.classList.remove('hidden'); galleria.classList.add('hidden');
+                btnCarica.classList.add('active-tab'); btnGalleria.classList.remove('active-tab');
+            } else {
+                galleria.classList.remove('hidden'); carica.classList.add('hidden');
+                btnGalleria.classList.add('active-tab'); btnCarica.classList.remove('active-tab');
+            }
+        };
+
+        // --- GESTIONE LOGICA DI ACCESSO (SPLASH SCREEN) ---
         window.onload = () => {
             const savedName = sessionStorage.getItem('wedding_session_name');
+            const savedTab = sessionStorage.getItem('wedding_active_tab') || 'carica';
+            
             const privacyScreen = document.getElementById('privacy-screen');
             const bgImg = document.getElementById('privacy-bg-img');
             const bgOverlay = document.getElementById('privacy-bg-overlay');
@@ -325,30 +400,25 @@
 
             if(savedName) {
                 globalGuestName = savedName;
+                
+                // Preparo lo Splash Screen (nessun testo, immagine a colori)
                 contentTop.style.display = 'none';
                 contentBottom.style.display = 'none';
+                
                 bgImg.classList.remove('transition-all', 'duration-1000', 'grayscale');
                 bgOverlay.style.display = 'none';
+
+                // Mantengo lo splash screen visibile per 1 secondo, poi sfumo
                 setTimeout(() => {
                     privacyScreen.classList.add('opacity-0', 'pointer-events-none');
                     setTimeout(() => {
                         privacyScreen.style.display = 'none';
                         document.getElementById('main-app').classList.replace('hidden', 'flex');
-                    }, 700);
+                        window.switchTab(savedTab);
+                    }, 700); // Attesa della fine della transizione opacity
                 }, 1000);
             }
         };
-
-        window.addEventListener('scroll', () => {
-            const btt = document.getElementById('back-to-top');
-            if (window.scrollY > 400) {
-                btt.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                btt.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
-            } else {
-                btt.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-                btt.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
-            }
-        });
 
         window.toggleEnterBtn = () => {
             const btn = document.getElementById('btn-enter');
@@ -356,6 +426,7 @@
             btn.classList.toggle('opacity-50', btn.disabled);
         };
 
+        // --- GESTIONE LOGICA PRIMO ACCESSO (EFFETTO WOW 2.5 SECONDI) ---
         window.enterApp = () => {
             let name = document.getElementById('guest-name').value.trim();
             globalGuestName = name ? name : `Invitato #${Math.floor(1000 + Math.random() * 9000)}`; 
@@ -367,16 +438,21 @@
             const contentTop = document.getElementById('privacy-content-top');
             const contentBottom = document.getElementById('privacy-content-bottom');
 
+            // 1. Sfumo via dolcemente testi e form
             contentTop.classList.add('opacity-0');
             contentBottom.classList.add('opacity-0');
+
+            // 2. Rendo nitida l'immagine e le dò i colori (tramite CSS)
             bgImg.classList.remove('grayscale');
             bgOverlay.classList.add('opacity-0');
 
+            // 3. Aspetto 2.5 secondi per far ammirare l'immagine nitida, poi passo all'app
             setTimeout(() => {
                 privacyScreen.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => {
                     privacyScreen.style.display = 'none';
                     document.getElementById('main-app').classList.replace('hidden', 'flex');
+                    window.switchTab('carica');
                 }, 700);
             }, 2500);
         };
@@ -404,18 +480,23 @@
         
         window.handleFileSelection = (event) => {
             let files = Array.from(event.target.files || []);
+            
             if (files.length === 0) { 
                 document.getElementById('selected-files-list').classList.add('hidden'); 
                 return; 
             }
+            
             const warningEl = document.getElementById('limit-warning');
-            if (files.length > 10) {
-                files = files.slice(0, 10); 
+            if (files.length > 5) {
+                files = files.slice(0, 5); 
                 warningEl.classList.remove('hidden');
-            } else { warningEl.classList.add('hidden'); }
+            } else {
+                warningEl.classList.add('hidden');
+            }
 
             selectedFilesArray = files.map(f => ({ file: f, comment: '' }));
             document.getElementById('files-count').innerText = selectedFilesArray.length;
+            
             const container = document.getElementById('preview-container');
             container.innerHTML = '';
             
@@ -432,9 +513,14 @@
                 `);
             });
             lucide.createIcons();
+            
             const listEl = document.getElementById('selected-files-list');
             listEl.classList.remove('hidden');
-            setTimeout(() => { listEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+            
+            setTimeout(() => {
+                listEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
             event.target.value = ''; 
         };
 
@@ -468,13 +554,11 @@
             for (let i = 0; i < total; i++) {
                 let item = selectedFilesArray[i];
                 try {
-                    const compressedFile = await compressImageClientSide(item.file);
-
                     const authRes = await fetch(IMAGEKIT_AUTH_ENDPOINT);
                     const authData = await authRes.json();
 
                     const formData = new FormData(); 
-                    formData.append("file", compressedFile);
+                    formData.append("file", item.file); 
                     formData.append("fileName", `wedding_${Date.now()}.jpg`);
                     formData.append("publicKey", IMAGEKIT_PUBLIC_KEY);
                     formData.append("signature", authData.signature);
@@ -497,11 +581,11 @@
                 document.getElementById('selected-files-list').classList.add('hidden');
                 bar.style.width = '0%'; ring.style.left = '0%'; text.innerText = '0%';
                 selectedFilesArray = [];
+                window.switchTab('galleria'); 
             }, 800);
         };
 
         window.deletePhoto = async (docId) => {
-            if(docId.startsWith("dummy")) return;
             if (confirm("Vuoi davvero eliminare questa foto? L'azione è irreversibile.")) {
                 try {
                     await deleteDoc(doc(db, "live_gallery", docId));
@@ -512,8 +596,6 @@
 
         window.toggleLike = async (docId, event, isDoubleClick = false) => {
             if(event && !isDoubleClick) event.stopPropagation(); 
-            if(docId.startsWith("dummy")) return; 
-
             const docRef = doc(db, "live_gallery", docId);
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             const btn = (event && !isDoubleClick && event.currentTarget && event.currentTarget.tagName === 'BUTTON') ? event.currentTarget : null;
@@ -533,6 +615,14 @@
 
         let clickTimer = null;
         window.handlePhotoClick = (index, docId, event) => {
+            if(isAdmin) {
+                if(selectedForAdmin.has(docId)) selectedForAdmin.delete(docId);
+                else selectedForAdmin.add(docId);
+                window.renderGallery();
+                window.updateAdminToolbar();
+                return;
+            }
+
             const target = event.currentTarget;
             const currentTime = new Date().getTime();
             const lastClick = parseInt(target.dataset.lastClick || '0');
@@ -552,12 +642,7 @@
 
         window.openLikesModal = (docId, event) => {
             if(event) event.stopPropagation();
-            let likesArr = [];
-            if(docId.startsWith("dummy")) {
-                const dummyItem = DUMMY_PHOTOS.find(d => d.docId === docId);
-                likesArr = dummyItem ? dummyItem.likes : [];
-            } else { likesArr = currentLikesMap[docId] || []; }
-
+            const likesArr = currentLikesMap[docId] || [];
             const listEl = document.getElementById('likes-list');
             listEl.innerHTML = '';
             if(likesArr.length === 0) {
@@ -578,69 +663,58 @@
             setTimeout(() => document.getElementById('likes-modal-overlay').classList.remove('opacity-0'), 10);
             document.getElementById('likes-modal').classList.add('open');
         };
-        
         window.closeLikesModal = () => {
             document.getElementById('likes-modal-overlay').classList.add('opacity-0');
             document.getElementById('likes-modal').classList.remove('open');
             setTimeout(() => document.getElementById('likes-modal-overlay').classList.add('hidden'), 300);
         };
-        
         let likesTouchStartY = 0;
         document.getElementById('likes-modal').addEventListener('touchstart', e => { likesTouchStartY = e.changedTouches[0].screenY; }, {passive: true});
         document.getElementById('likes-modal').addEventListener('touchend', e => { if (e.changedTouches[0].screenY > likesTouchStartY + 60) window.closeLikesModal(); }, {passive: true});
 
         window.renderGallery = () => {
             const gallery = document.getElementById("gallery-grid");
-            
-            currentDisplayData = globalGalleryData.length > 0 ? globalGalleryData : DUMMY_PHOTOS;
-            
-            if(currentDisplayData.length === 0) {
-                gallery.innerHTML = ""; return;
+            if(globalGalleryData.length === 0) {
+                gallery.className = "w-full mt-10";
+                gallery.innerHTML = `<div class="bg-white/50 backdrop-blur-md border border-white/50 rounded-3xl p-10 flex flex-col items-center text-center"><i data-lucide="image" class="w-10 h-10 text-wedding-brown/30 mb-4"></i><p class="font-serif text-xl font-light text-wedding-dark mb-1">Nessuna foto ancora</p><p class="text-[9px] uppercase tracking-widest text-gray-400">Sii il primo a scattare!</p></div>`;
+                lucide.createIcons(); return;
             }
             
+            gallery.className = "grid grid-cols-3 gap-2 w-full";
+            gallery.innerHTML = "";
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             
-            const currentIds = new Set(currentDisplayData.map(item => item.docId));
-            Array.from(gallery.children).forEach(child => {
-                const childId = child.id.replace('photo-', '');
-                if (!currentIds.has(childId)) { child.remove(); }
-            });
-
-            currentDisplayData.forEach((item, pIndex) => {
+            globalGalleryData.forEach((item, pIndex) => {
                 const docId = item.docId;
-                const likesArr = currentLikesMap[docId] || item.likes || [];
+                const likesArr = currentLikesMap[docId] || [];
                 const isLiked = localLikes.includes(docId);
                 const cleanName = item.guestName ? item.guestName.split(' ')[0] : 'Ospite';
                 const heartIcon = isLiked ? `<i data-lucide="heart" class="w-3 h-3 fill-red-500 text-red-500"></i>` : `<i data-lucide="heart" class="w-3 h-3 text-white/80"></i>`;
                 
-                let existingEl = document.getElementById(`photo-${docId}`);
-                
-                if (existingEl) {
-                    const likesContainer = existingEl.querySelector('.likes-wrapper');
-                    if(likesArr.length > 0) {
-                        likesContainer.innerHTML = `<div class="flex items-center gap-1 text-white bg-black/30 px-1.5 py-0.5 rounded-full backdrop-blur-sm">${heartIcon}<span class="text-[8px] font-bold">${likesArr.length}</span></div>`;
-                    } else { likesContainer.innerHTML = ''; }
-                    existingEl.onclick = (e) => window.handlePhotoClick(pIndex, docId, e);
-                } else {
-                    const el = document.createElement('div');
-                    el.id = `photo-${docId}`;
-                    // Aggiunto "pointer-events-none" all'immagine così l'utente NON PUÒ tenere premuto per salvare la miniatura dalla griglia
-                    el.className = "relative aspect-square rounded-2xl overflow-hidden shadow-sm bg-gray-100/50 border border-white/50 cursor-pointer select-none photo-reveal";
-                    el.onclick = (e) => window.handlePhotoClick(pIndex, docId, e);
-                    el.innerHTML = `
-                        <img src="${window.getOptimizedUrl(item.url, true)}" loading="lazy" class="w-full h-full object-cover pointer-events-none">
+                const isSelected = selectedForAdmin.has(docId);
+                const adminOverlay = isAdmin ? `
+                    <div class="absolute inset-0 z-20 pointer-events-none transition-all duration-200 ${isSelected ? 'bg-black/20 border-4 border-wedding-sage' : ''}">
+                        <div class="absolute top-2 right-2 w-6 h-6 rounded-full border-[1.5px] ${isSelected ? 'bg-wedding-sage border-wedding-sage text-white' : 'border-white/80 bg-black/20'} flex items-center justify-center">
+                            ${isSelected ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+                        </div>
+                    </div>
+                ` : '';
+
+                gallery.insertAdjacentHTML('beforeend', `
+                    <div class="relative aspect-square rounded-2xl overflow-hidden shadow-sm bg-gray-100/50 border border-white/50 cursor-pointer select-none ${isSelected ? 'scale-[0.97] admin-selected' : 'photo-reveal'}" onclick="window.handlePhotoClick(${pIndex}, '${docId}', event)">
+                        <img src="${window.getOptimizedUrl(item.url, true)}" class="w-full h-full object-cover no-save">
+                        ${adminOverlay}
                         <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-2 pt-8 flex justify-between items-end z-10 pointer-events-none">
                             <p class="text-[8px] text-white/90 font-medium truncate pr-1">by ${cleanName}</p>
-                            <div class="likes-wrapper">
-                                ${likesArr.length > 0 ? `<div class="flex items-center gap-1 text-white bg-black/30 px-1.5 py-0.5 rounded-full backdrop-blur-sm">${heartIcon}<span class="text-[8px] font-bold">${likesArr.length}</span></div>` : ''}
-                            </div>
+                            ${likesArr.length > 0 && !isAdmin ? `
+                                <div class="flex items-center gap-1 text-white bg-black/30 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                                    ${heartIcon}
+                                    <span class="text-[8px] font-bold">${likesArr.length}</span>
+                                </div>
+                            ` : ''}
                         </div>
-                    `;
-                    gallery.appendChild(el);
-                }
-                
-                const finalEl = document.getElementById(`photo-${docId}`);
-                if(finalEl) finalEl.style.order = pIndex;
+                    </div>
+                `);
             });
             lucide.createIcons();
         };
@@ -655,7 +729,7 @@
                 }
             });
             window.renderGallery();
-            if(!document.getElementById('lightbox-modal').classList.contains('hidden')) { window.updateLightboxUI(); }
+            if(!document.getElementById('lightbox-modal').classList.contains('hidden') && !isAdmin) { window.updateLightboxUI(); }
         });
 
         window.openLightbox = (index) => {
@@ -671,8 +745,8 @@
         };
         
         window.updateLightboxUI = () => {
-            if (currentDisplayData.length === 0) return;
-            const item = currentDisplayData[currentLightboxIndex];
+            if (globalGalleryData.length === 0) return;
+            const item = globalGalleryData[currentLightboxIndex];
             if (!item) return;
             const docId = item.docId;
             
@@ -683,7 +757,7 @@
             
             const localLikes = JSON.parse(localStorage.getItem('wedding_likes') || '[]');
             const isLiked = localLikes.includes(docId);
-            const likesArr = currentLikesMap[docId] || item.likes || [];
+            const likesArr = currentLikesMap[docId] || [];
             
             const actionBtn = document.getElementById('lightbox-action-like');
             actionBtn.onclick = (e) => window.toggleLike(docId, e);
@@ -691,7 +765,7 @@
             
             const deleteContainer = document.getElementById('lightbox-delete-container');
             if (deleteContainer) {
-                if (item.deviceId && item.deviceId === deviceId && !docId.startsWith("dummy")) {
+                if (item.deviceId && item.deviceId === deviceId) {
                     deleteContainer.innerHTML = `<button onclick="window.deletePhoto('${docId}')" class="p-2 text-red-500 bg-red-50/80 hover:bg-red-100 rounded-full active:scale-95 transition-all flex items-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
                 } else { deleteContainer.innerHTML = ''; }
             }
@@ -705,8 +779,22 @@
             lucide.createIcons();
         };
 
-        window.prevLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex - 1 + currentDisplayData.length) % currentDisplayData.length; window.updateLightboxUI(); };
-        window.nextLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex + 1) % currentDisplayData.length; window.updateLightboxUI(); };
+        let lightboxClickTime = 0;
+        window.handleLightboxDoubleClick = (event) => {
+            const currentTime = new Date().getTime(); const timeDiff = currentTime - lightboxClickTime;
+            if (timeDiff < 300 && timeDiff > 0) {
+                const item = globalGalleryData[currentLightboxIndex];
+                if(item) {
+                    window.toggleLike(item.docId, event, true);
+                    let clientX = event.clientX; let clientY = event.clientY;
+                    if(event.touches && event.touches.length > 0) { clientX = event.touches[0].clientX; clientY = event.touches[0].clientY; }
+                    window.showFloatingHeart(clientX, clientY);
+                }
+                lightboxClickTime = 0;
+            } else { lightboxClickTime = currentTime; }
+        };
+        window.prevLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex - 1 + globalGalleryData.length) % globalGalleryData.length; window.updateLightboxUI(); };
+        window.nextLightbox = (e) => { if(e) e.stopPropagation(); currentLightboxIndex = (currentLightboxIndex + 1) % globalGalleryData.length; window.updateLightboxUI(); };
         
         let touchStartX = 0;
         document.getElementById('lightbox-modal').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
@@ -715,6 +803,179 @@
             if (e.changedTouches[0].screenX > touchStartX + 50) window.prevLightbox();
         }, {passive: true});
 
+        window.handleSecretAdmin = (e) => {
+            if(e) e.preventDefault();
+            if(isAdmin) { window.exitAdminMode(); return; } 
+            
+            adminTapCount++;
+            const icon = document.getElementById('lock-icon');
+            if(icon) { icon.classList.add('scale-150', 'text-wedding-brown'); setTimeout(() => icon.classList.remove('scale-150', 'text-wedding-brown'), 150); }
+            
+            clearTimeout(adminTapTimer);
+            if (adminTapCount >= 3) {
+                isSecretUnlocked = true; adminTapCount = 0;
+                confetti({ particleCount: 30, origin: { y: 0.1 }, colors: ['#D4AF37'] }); window.openPinModal();
+            } else { adminTapTimer = setTimeout(() => { adminTapCount = 0; isSecretUnlocked = false; }, 800); }
+        };
+
+        window.openPinModal = () => { document.getElementById('pin-modal').classList.replace('hidden', 'flex'); enteredPin = ""; window.updatePinDots(); };
+        window.closePinModal = () => { document.getElementById('pin-modal').classList.replace('flex', 'hidden'); };
+        
+        window.enterPin = (num) => {
+            if (enteredPin.length < 4) {
+                enteredPin += num; window.updatePinDots();
+                if (enteredPin.length === 4) {
+                    setTimeout(() => {
+                        if (enteredPin === PIN_CODE && isSecretUnlocked) {
+                            isAdmin = true;
+                            selectedForAdmin.clear();
+                            document.getElementById('admin-badge').classList.remove('hidden'); 
+                            document.getElementById('standard-nav').classList.replace('flex', 'hidden');
+                            document.getElementById('admin-nav').classList.replace('hidden', 'flex');
+                            
+                            window.closePinModal();
+                            
+                            document.getElementById('screen-carica').classList.add('hidden');
+                            document.getElementById('screen-galleria').classList.replace('hidden', 'flex');
+                            
+                            window.renderGallery(); 
+                            window.updateAdminToolbar();
+                            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#5D6D5E', '#D4AF37'] });
+                        } else {
+                            const dots = document.querySelector('.pin-dot').parentElement;
+                            dots.classList.add('animate-bounce');
+                            setTimeout(() => { dots.classList.remove('animate-bounce'); enteredPin = ""; window.updatePinDots(); }, 500);
+                        }
+                    }, 300);
+                }
+            }
+        };
+        window.updatePinDots = () => { document.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('bg-wedding-gold', i < enteredPin.length)); };
+        window.clearPin = () => { enteredPin = ""; window.updatePinDots(); };
+
+        window.exitAdminMode = () => {
+            isAdmin = false;
+            selectedForAdmin.clear();
+            document.getElementById('admin-badge').classList.add('hidden');
+            document.getElementById('admin-nav').classList.replace('flex', 'hidden');
+            document.getElementById('standard-nav').classList.replace('hidden', 'flex');
+            window.renderGallery();
+        };
+
+        window.updateAdminToolbar = () => {
+            const count = selectedForAdmin.size;
+            const btnDel = document.getElementById('admin-btn-delete');
+            const btnDown = document.getElementById('admin-btn-download');
+            
+            if(count > 0) {
+                btnDel.classList.remove('opacity-50', 'pointer-events-none');
+                btnDown.classList.remove('opacity-50', 'pointer-events-none');
+            } else {
+                btnDel.classList.add('opacity-50', 'pointer-events-none');
+                btnDown.classList.add('opacity-50', 'pointer-events-none');
+            }
+
+            const selectAllIcon = document.getElementById('admin-select-all-icon');
+            if(count === globalGalleryData.length && count > 0) {
+                selectAllIcon.innerHTML = `<i data-lucide="check" class="w-4 h-4 text-white"></i>`;
+                selectAllIcon.classList.replace('border-white/50', 'bg-wedding-sage');
+                selectAllIcon.classList.add('border-wedding-sage');
+            } else {
+                selectAllIcon.innerHTML = '';
+                selectAllIcon.classList.replace('bg-wedding-sage', 'border-white/50');
+                selectAllIcon.classList.remove('border-wedding-sage');
+            }
+            lucide.createIcons();
+        };
+
+        window.toggleSelectAll = () => {
+            if(selectedForAdmin.size === globalGalleryData.length) {
+                selectedForAdmin.clear();
+            } else {
+                globalGalleryData.forEach(item => selectedForAdmin.add(item.docId));
+            }
+            window.renderGallery();
+            window.updateAdminToolbar();
+        };
+
+        window.deleteSelectedPhotos = async () => {
+            if (selectedForAdmin.size === 0) return;
+            if (confirm(`Sei sicuro di voler eliminare DEFINITIVAMENTE ${selectedForAdmin.size} foto dal database?`)) {
+                const arrDocs = Array.from(selectedForAdmin);
+                for(let docId of arrDocs) {
+                    try { await deleteDoc(doc(db, "live_gallery", docId)); } catch(e) {}
+                }
+                selectedForAdmin.clear();
+                window.updateAdminToolbar();
+            }
+        };
+
+        window.downloadSelectedZIP = async () => {
+            if (selectedForAdmin.size === 0) return;
+            
+            const overlay = document.getElementById('upload-overlay');
+            const title = document.getElementById('overlay-title');
+            const subtitle = document.getElementById('overlay-subtitle');
+            const bar = document.getElementById('progress-bar');
+            const ring = document.getElementById('ring-icon');
+            const text = document.getElementById('progress-percentage');
+            
+            document.getElementById('overlay-icon').setAttribute('data-lucide', 'package');
+            lucide.createIcons();
+            
+            title.innerText = "Creazione ZIP in corso...";
+            subtitle.innerText = "Attendere, sto impacchettando i ricordi";
+            overlay.classList.remove('hidden');
+            
+            const zip = new JSZip();
+            const photosFolder = zip.folder("Album_Sposi");
+            let processed = 0;
+            const total = selectedForAdmin.size;
+            const arrDocs = Array.from(selectedForAdmin);
+            
+            for(let docId of arrDocs) {
+                const item = globalGalleryData.find(g => g.docId === docId);
+                if(item) {
+                    try {
+                        const url = window.getOptimizedUrl(item.url, false);
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        const safeName = item.guestName.replace(/[^a-zA-Z0-9]/g, '_') || 'Ospite';
+                        const fileName = `foto_${safeName}_${Math.floor(Math.random()*1000)}.jpg`;
+                        photosFolder.file(fileName, blob);
+                    } catch(e) { console.error("Errore fetch foto per ZIP", e); }
+                }
+                processed++;
+                let percent = Math.round((processed / total) * 100);
+                bar.style.width = percent + '%'; ring.style.left = percent + '%'; text.innerText = percent + '%';
+            }
+            
+            title.innerText = "Compressione finale...";
+            subtitle.innerText = "Quasi pronto!";
+            
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                const url = window.URL.createObjectURL(content);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Album_Sposi_Michela_Maurizio.zip";
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                
+                overlay.classList.add('hidden');
+                title.innerText = "Custodendo i ricordi...";
+                document.getElementById('overlay-icon').setAttribute('data-lucide', 'cloud-upload');
+                bar.style.width = '0%'; ring.style.left = '0%'; text.innerText = '0%';
+                
+                selectedForAdmin.clear();
+                window.renderGallery();
+                window.updateAdminToolbar();
+            });
+        };
     </script>
 </body>
 </html>
+
+
+```
