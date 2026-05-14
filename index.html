@@ -1,11 +1,42 @@
-<!-- [MAINTENANCE_OVERLAY] -->
-<div id="pause-overlay" class="fixed inset-0 z-[9999] bg-[#3E2723] flex flex-col items-center justify-center text-center px-6">
-    <h2 class="font-editorial text-4xl text-white mb-4">I ricordi sono al sicuro.</h2>
-    <p class="text-ayd-surface opacity-80 max-w-md mb-8">
-        La galleria live di questo evento è giunta al termine. 
-        Grazie per aver condiviso i vostri momenti magici!
+<!-- [PAUSE_OVERLAY] -->
+<div id="event-archive-overlay" class="fixed inset-0 z-[10000] bg-[#0a0a0a] flex flex-col items-center justify-center text-center px-6 py-12 select-none">
+    
+    <!-- Animazione Sigillo Elegante -->
+    <div class="mb-8 opacity-0 animate-[fadeIn_1s_ease-out_forwards]">
+        <div class="relative w-24 h-24 border border-ayd-accent/30 rounded-full flex items-center justify-center">
+            <span class="font-editorial text-4xl text-ayd-accent italic">A</span>
+            <!-- Decorazione scintille/glow -->
+            <div class="absolute inset-0 bg-ayd-accent/5 blur-2xl rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Messaggio di Fine Evento -->
+    <h1 class="font-editorial text-3xl md:text-5xl text-white mb-6 leading-tight max-w-2xl opacity-0 animate-[slideUp_0.8s_ease-out_0.3s_forwards]">
+        I ricordi più belli hanno trovato casa.
+    </h1>
+    
+    <p class="text-ayd-surface/60 font-light text-base md:text-lg max-w-md mb-12 leading-relaxed opacity-0 animate-[slideUp_0.8s_ease-out_0.5s_forwards]">
+        L'evento è giunto al termine e la galleria live è stata archiviata per preservarne la magia. Grazie per aver reso questa giornata indimenticabile.
     </p>
-    <a href="https://announceyourday.com" class="text-ayd-accent underline uppercase tracking-widest text-xs font-bold">
-        creato con ❤️ da announceyourday.com
-    </a>
+
+    <!-- [BRAND_SIGNATURE] -->
+    <div class="mt-auto opacity-0 animate-[fadeIn_1s_ease-out_1s_forwards]">
+        <p class="text-[10px] uppercase tracking-[0.3em] text-white/30 mb-2">Digital Event Experience</p>
+        <a href="https://announceyourday.com" class="text-ayd-surface hover:text-ayd-accent transition-colors text-xs font-light">
+            creato con ❤️ da <span class="font-bold">announceyourday.com</span>
+        </a>
+    </div>
 </div>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    /* Blocca lo scroll del body quando l'overlay è attivo */
+    body { overflow: hidden !important; }
+</style>
